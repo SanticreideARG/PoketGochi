@@ -1,0 +1,2148 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>PoketGochi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ece1c8;
+    --bg-2: #f5ecd5;
+    --shell: #1d1916;
+    --shell-2: #2a2520;
+    --shell-rim: #0e0c0a;
+    --screen-bg: #d4e9b5;
+    --screen-bg-2: #b8d894;
+    --ink: #1a1410;
+    --accent: #22c55e;
+    --btn-face: #f4ead4;
+    --btn-shadow: #b89e76;
+    --btn-deep: #8a6e45;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: 'Fredoka', system-ui, sans-serif;
+    background: transparent !important;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    gap: 22px;
+    overflow-x: hidden;
+  }
+
+  /* ---- DEVICE (almost all screen) ---- */
+  .device {
+    width: 380px;
+    max-width: 100%;
+    aspect-ratio: 380 / 460;
+    position: relative;
+    background: linear-gradient(160deg, var(--shell-2) 0%, var(--shell) 70%, #050403 100%);
+    border-radius: 32px;
+    padding: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -2px 4px rgba(0,0,0,0.6),
+      0 24px 40px -16px rgba(0,0,0,0.5),
+      0 8px 16px -6px rgba(0,0,0,0.3);
+    -webkit-app-region: drag;
+  }
+  .exit-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.4);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    -webkit-app-region: no-drag;
+    transition: color 0.2s;
+  }
+  .exit-btn:hover { color: #ef4444; }
+
+  /* tiny brand mark on top bezel */
+  .brand {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    font-size: 7px;
+    color: rgba(255, 250, 230, 0.55);
+    z-index: 3;
+  }
+  /* indicator dot */
+  .led {
+    position: absolute;
+    top: 6px; left: 18px;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--accent);
+    z-index: 3;
+  }
+
+  /* ---- SCREEN ---- */
+  .screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 90% at 50% 0%, var(--screen-bg) 0%, var(--screen-bg-2) 100%);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 0 1px rgba(0,0,0,0.18),
+      inset 0 4px 10px rgba(0,0,0,0.12);
+  }
+  /* faint pixel grid */
+  .screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.03) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+    z-index: 4;
+  }
+  .screen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(160% 100% at 50% 120%, rgba(0,0,0,0.2), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 18%);
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* ---- HUD ---- */
+  .hud {
+    position: absolute;
+    top: 10px; left: 12px; right: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    z-index: 6;
+    font-family: 'VT323', monospace;
+    color: #1f1408;
+    font-size: 14px;
+  }
+  .stats { display: flex; flex-direction: column; gap: 4px; }
+  .stat { display: flex; align-items: center; gap: 6px; line-height: 1; }
+  .stat .label { width: 14px; text-align: center; font-size: 13px; }
+  .meter { display: flex; gap: 2px; }
+  .meter .pip {
+    width: 9px; height: 9px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.3);
+  }
+  .meter .pip.on { background: var(--ink); }
+  .meter .pip.warn { background: #c2410c; border-color: #7c2d12; }
+
+  .right-hud {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .clock {
+    font-family: 'VT323', monospace;
+    font-size: 17px;
+    background: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.25);
+    padding: 1px 7px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+
+  .coins {
+    font-family: 'VT323', monospace;
+    font-size: 15px;
+    background: rgba(217, 119, 6, 0.1);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: #92400e;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ---- OWL STAGE ---- */
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 30px;
+    z-index: 2;
+  }
+  .ground {
+    position: absolute;
+    bottom: 22px; left: 24px; right: 24px;
+    height: 1px;
+    border-bottom: 2px dashed rgba(0,0,0,0.28);
+    z-index: 1;
+  }
+  .owl {
+    width: 58%;
+    height: auto;
+    overflow: visible;
+    transform-origin: 50% 100%;
+    animation: hop 2.6s ease-in-out infinite;
+    will-change: transform;
+    /* center absolutely so the base & evolved owls can overlap during transition */
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    margin-left: -29%;
+  }
+
+  /* ---- SPEAK BUBBLE / OVERLAYS ---- */
+  .bubble {
+    position: absolute;
+    top: 22%;
+    right: 12%;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-family: 'VT323', monospace;
+    font-size: 17px;
+    line-height: 1.1;
+    max-width: 140px;
+    text-align: center;
+    word-wrap: break-word;
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 6;
+    pointer-events: none;
+  }
+  .bubble.show { opacity: 1; transform: translateY(0) scale(1); }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    left: -2px;
+    bottom: -8px;
+    width: 12px; height: 12px;
+    background: #fff;
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: rotate(45deg);
+  }
+
+  .z-stack {
+    position: absolute;
+    top: 22%; left: 58%;
+    z-index: 6;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .z-stack.show { opacity: 1; }
+  .z-stack span {
+    display: inline-block;
+    font-size: 22px;
+    animation: zfloat 2.4s ease-in-out infinite;
+  }
+  .z-stack span:nth-child(2){ font-size: 16px; animation-delay: 0.6s; margin-left: -4px; }
+  .z-stack span:nth-child(3){ font-size: 12px; animation-delay: 1.2s; margin-left: -3px; }
+  @keyframes zfloat {
+    0% { transform: translate(0, 6px); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(10px, -22px); opacity: 0; }
+  }
+
+  .hearts, .crumbs { position: absolute; inset: 0; pointer-events: none; z-index: 6; }
+  .heart {
+    position: absolute;
+    font-size: 20px;
+    color: #ef4444;
+    opacity: 0;
+    animation: heartfloat 1.6s ease-out forwards;
+    filter: drop-shadow(0 1px 0 rgba(0,0,0,0.2));
+  }
+  @keyframes heartfloat {
+    0% { transform: translateY(0) scale(0.6); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-70px) scale(1.15); opacity: 0; }
+  }
+  .crumb {
+    position: absolute;
+    width: 7px; height: 7px;
+    background: #c2410c;
+    border: 1px solid #7c2d12;
+    border-radius: 2px;
+    opacity: 0;
+    animation: crumbpop 0.9s ease-out forwards;
+  }
+  @keyframes crumbpop {
+    0% { transform: translate(0, -6px) rotate(0); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translate(var(--dx, 0px), 30px) rotate(360deg); opacity: 0; }
+  }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes hop {
+    0%, 70%, 100% { transform: translateY(0); }
+    78% { transform: translateY(-12px) scaleY(1.03); }
+    86% { transform: translateY(-2px) scaleY(0.98); }
+    92% { transform: translateY(0) scaleY(1); }
+  }
+  @keyframes hop-fast {
+    0%, 45%, 100% { transform: translateY(0); }
+    55% { transform: translateY(-15px); }
+    65% { transform: translateY(0); }
+    75% { transform: translateY(-10px); }
+    85% { transform: translateY(0); }
+  }
+
+  .breathe { animation: breathe 3s ease-in-out infinite; transform-origin: 50% 90%; transform-box: fill-box; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.015, 0.985); }
+  }
+
+  /* blink */
+  .eyelid {
+    transform-origin: 50% 0%;
+    transform-box: fill-box;
+    transform: scaleY(0);
+    animation: blink 5s ease-in-out infinite;
+  }
+  .eyelid.right { animation-delay: 0.05s; }
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(0); }
+    94%, 96% { transform: scaleY(1); }
+  }
+
+  /* sleep */
+  .owl.sleeping .eyelid { animation: none; transform: scaleY(1); }
+  .owl.sleeping .eye-inner { visibility: hidden; }
+  .eyelash { visibility: hidden; }
+  .owl.sleeping .eyelash { visibility: visible; }
+  .owl.sleeping { animation: snore 4s ease-in-out infinite; }
+  @keyframes snore {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* beak chirp */
+  .beak-bottom-grp {
+    transform-origin: 50% 0%;
+    transform-box: fill-box;
+    animation: chirp 3.4s ease-in-out infinite;
+  }
+  @keyframes chirp {
+    0%, 60%, 100% { transform: translateY(0) scaleY(1); }
+    70% { transform: translateY(2px) scaleY(1.7); }
+    78% { transform: translateY(0) scaleY(1); }
+    84% { transform: translateY(2px) scaleY(1.45); }
+    90% { transform: translateY(0) scaleY(1); }
+  }
+  .owl.sleeping .beak-bottom-grp { animation: none; }
+
+  /* wing flap */
+  .wing-left {
+    transform-origin: 92% 22%;
+    transform-box: fill-box;
+    animation: flapL 2.2s ease-in-out infinite;
+  }
+  .wing-right {
+    transform-origin: 8% 22%;
+    transform-box: fill-box;
+    animation: flapR 2.2s ease-in-out infinite;
+  }
+  @keyframes flapL {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-24deg); }
+  }
+  @keyframes flapR {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(24deg); }
+  }
+  .owl.sleeping .wing-left, .owl.sleeping .wing-right { animation: none; }
+  .owl.excited .wing-left { animation: flapFastL 0.35s ease-in-out infinite; }
+  .owl.excited .wing-right { animation: flapFastR 0.35s ease-in-out infinite; }
+  @keyframes flapFastL {
+    0%, 100% { transform: rotate(-8deg); }
+    50% { transform: rotate(-44deg); }
+  }
+  @keyframes flapFastR {
+    0%, 100% { transform: rotate(8deg); }
+    50% { transform: rotate(44deg); }
+  }
+  .owl.excited { animation: hop-fast 0.7s ease-in-out infinite; }
+
+  .owl.sick { filter: saturate(0.7) hue-rotate(-10deg); }
+  .swirl {
+    position: absolute;
+    top: 18%; right: 16%;
+    font-size: 24px;
+    z-index: 6;
+    opacity: 0;
+    color: #6b7280;
+    animation: spin 2.2s linear infinite;
+  }
+  .swirl.show { opacity: 1; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* pet name */
+  .pet-name {
+    position: absolute;
+    bottom: 8px; left: 0; right: 0;
+    text-align: center;
+    z-index: 6;
+    font-family: 'VT323', monospace;
+    font-size: 17px;
+    color: var(--ink);
+    letter-spacing: 1.5px;
+  }
+
+  /* ---- BUTTONS (new pill style) ---- */
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 380px;
+    max-width: 100%;
+  }
+  .btn {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(180deg, #ffffff 0%, var(--btn-face) 50%, #d8c39a 100%);
+    border-radius: 20px;
+    padding: 14px 8px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 -4px 0 var(--btn-deep),
+      0 4px 0 rgba(0,0,0,0.18),
+      0 8px 14px -4px rgba(0,0,0,0.25);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    font-family: 'Fredoka', sans-serif;
+    color: #3a2410;
+    position: relative;
+    -webkit-app-region: no-drag;
+  }
+  .btn:hover { transform: translateY(1px); }
+  .btn:active {
+    transform: translateY(3px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      inset 0 -1px 0 var(--btn-deep),
+      0 1px 0 rgba(0,0,0,0.18);
+  }
+  .btn .ico {
+    width: 30px; height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn .ico svg { width: 100%; height: 100%; display: block; }
+  .btn .lbl {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6b4220;
+  }
+
+  /* ---- SHOP MODAL ---- */
+  .shop-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100;
+    display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+    -webkit-app-region: no-drag;
+  }
+  .shop-modal.open { display: flex; }
+  .shop-content {
+    background: var(--bg-2); border: 3px solid var(--shell-2); border-radius: 16px;
+    width: 320px; max-width: 90%; padding: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+  .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px dashed rgba(0,0,0,0.1); padding-bottom: 8px; }
+  .shop-header h2 { margin: 0; font-family: 'Fredoka', sans-serif; color: var(--ink); font-size: 20px; }
+  .close-btn { background: transparent; border: none; font-size: 24px; color: var(--ink); cursor: pointer; line-height: 1; }
+  .shop-items { display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+  .shop-items::-webkit-scrollbar { width: 6px; }
+  .shop-items::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+  .shop-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.4); padding: 10px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); }
+  .item-icon { font-size: 28px; background: rgba(255,255,255,0.8); width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+  .item-info { flex: 1; }
+  .item-info h3 { margin: 0 0 2px; font-size: 14px; color: var(--ink); }
+  .item-info p { margin: 0; font-size: 11px; color: #666; line-height: 1.2; }
+  .buy-btn { background: #f59e0b; color: #fff; border: none; padding: 6px 12px; border-radius: 12px; font-family: 'Fredoka', sans-serif; font-weight: 600; cursor: pointer; box-shadow: 0 3px 0 #b45309; transition: transform 0.1s; }
+  .buy-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #b45309; }
+  .buy-btn[disabled] { background: #d1d5db; box-shadow: 0 3px 0 #9ca3af; cursor: not-allowed; color: #6b7280; }
+
+  @keyframes floatNote {
+    0% { transform: translateY(0) scale(0.8); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(-20px) scale(1.2); opacity: 0; }
+  }
+  #item-recordplayer .music-note { animation: floatNote 2.5s ease-in-out infinite; }
+
+  /* Night mode */
+  body.night {
+    --bg: transparent;
+    --bg-2: transparent;
+    --shell: #0a0820;
+    --shell-2: #1a1736;
+    --screen-bg: #2b3d68;
+    --screen-bg-2: #18254a;
+    --ink: #d8e5ff;
+    --btn-face: #2c2649;
+    --btn-deep: #0a0820;
+  }
+  body.night .pet-name, body.night .hud { color: #c8d8ff; }
+  body.night .meter .pip.on { background: #c8d8ff; }
+  body.night .meter .pip { border-color: rgba(200,216,255,0.4); background: rgba(200,216,255,0.1); }
+  body.night .ground { border-color: rgba(200,216,255,0.3); }
+  body.night .clock { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #c8d8ff; }
+  body.night .coins { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3); color: #fcd34d; }
+  body.night .bubble { background: #1c2152; color: #d8e5ff; border-color: #d8e5ff; }
+  body.night .bubble::after { background: #1c2152; border-color: #d8e5ff; }
+  body.night .btn { color: #d8e5ff; background: linear-gradient(180deg, #3a3460 0%, var(--btn-face) 50%, #0a0820 100%); }
+  body.night .btn .lbl { color: rgba(216,229,255,0.7); }
+
+  body.night .shop-content { background: var(--shell); border-color: #3a3460; }
+  body.night .shop-item { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+  body.night .item-info h3, body.night .shop-header h2, body.night .close-btn { color: #d8e5ff; }
+  body.night .item-info p { color: #9aa6c8; }
+  body.night .item-icon { background: rgba(0,0,0,0.3); }
+
+  .credit {
+    font-size: 10px;
+    color: rgba(74, 36, 16, 0.45);
+    font-family: 'VT323', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* =================== EVOLUTION =================== */
+  /* Evolved owl starts hidden, then gets revealed mid-flash. */
+  .owl.evolved-form {
+    width: 70%; /* ~20% taller/bigger than base 58% */
+    display: none;
+    transform-origin: 50% 100%;
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    margin-left: -35%;
+  }
+  body.is-evolved .owl.base-form { display: none; }
+  body.is-evolved .owl.evolved-form { display: block; animation: hop 2.8s ease-in-out infinite; }
+
+  /* Bright white-out overlay disk that grows from the owl during evolution */
+  .evo-flash {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translate(-50%, 0) scale(0);
+    width: 70%;
+    aspect-ratio: 1 / 1.25;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 55%, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.85) 70%, rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 60px 30px rgba(255,255,255,0.9);
+    filter: blur(2px);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 7;
+    mix-blend-mode: screen;
+  }
+  body.evo-running .evo-flash { animation: evoFlash 3.2s ease-in-out forwards; }
+  @keyframes evoFlash {
+    0%   { transform: translate(-50%, 0) scale(0.05); opacity: 0; }
+    12%  { transform: translate(-50%, 0) scale(0.55); opacity: 0.85; }
+    35%  { transform: translate(-50%, 0) scale(1.05); opacity: 1; }
+    60%  { transform: translate(-50%, 0) scale(1.15); opacity: 1; }
+    78%  { transform: translate(-50%, 0) scale(1.25); opacity: 0.9; }
+    100% { transform: translate(-50%, 0) scale(1.5);  opacity: 0; }
+  }
+
+  /* Light rays radiating from the owl */
+  .evo-rays {
+    position: absolute;
+    left: 50%; bottom: 22px;
+    width: 100%; aspect-ratio: 1;
+    transform: translate(-50%, 30%) rotate(0deg);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    background:
+      conic-gradient(from 0deg,
+        rgba(255,255,255,0) 0deg, rgba(255,255,255,0.6) 6deg, rgba(255,255,255,0) 14deg,
+        rgba(255,255,255,0) 30deg, rgba(255,255,240,0.5) 38deg, rgba(255,255,255,0) 46deg,
+        rgba(255,255,255,0) 62deg, rgba(255,255,255,0.55) 70deg, rgba(255,255,255,0) 78deg,
+        rgba(255,255,255,0) 94deg, rgba(255,255,240,0.5) 102deg, rgba(255,255,255,0) 110deg,
+        rgba(255,255,255,0) 126deg, rgba(255,255,255,0.55) 134deg, rgba(255,255,255,0) 142deg,
+        rgba(255,255,255,0) 158deg, rgba(255,255,240,0.5) 166deg, rgba(255,255,255,0) 174deg,
+        rgba(255,255,255,0) 190deg, rgba(255,255,255,0.55) 198deg, rgba(255,255,255,0) 206deg,
+        rgba(255,255,255,0) 222deg, rgba(255,255,240,0.5) 230deg, rgba(255,255,255,0) 238deg,
+        rgba(255,255,255,0) 254deg, rgba(255,255,255,0.55) 262deg, rgba(255,255,255,0) 270deg,
+        rgba(255,255,255,0) 286deg, rgba(255,255,240,0.5) 294deg, rgba(255,255,255,0) 302deg,
+        rgba(255,255,255,0) 318deg, rgba(255,255,255,0.55) 326deg, rgba(255,255,255,0) 334deg,
+        rgba(255,255,255,0) 350deg, rgba(255,255,240,0.5) 358deg, rgba(255,255,255,0) 360deg);
+    -webkit-mask: radial-gradient(circle, transparent 18%, #000 22%, #000 65%, transparent 80%);
+            mask: radial-gradient(circle, transparent 18%, #000 22%, #000 65%, transparent 80%);
+  }
+  body.evo-running .evo-rays { animation: evoRays 3.2s linear forwards; }
+  @keyframes evoRays {
+    0%   { opacity: 0; transform: translate(-50%, 30%) rotate(0deg); }
+    20%  { opacity: 0.6; }
+    50%  { opacity: 0.9; }
+    80%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translate(-50%, 30%) rotate(180deg); }
+  }
+
+  /* The owl: silhouette pulses to pure white, shakes, then snaps to evolved. */
+  body.evo-running .owl {
+    animation: evoShake 0.18s linear infinite, evoWhiten 3.2s ease-in-out forwards;
+  }
+  /* Original idle anims are paused during evolution by class on body */
+  body.evo-running .owl.base-form .breathe,
+  body.evo-running .owl.base-form .wing-left,
+  body.evo-running .owl.base-form .wing-right,
+  body.evo-running .owl.base-form .eyelid,
+  body.evo-running .owl.base-form .beak-bottom-grp { animation-play-state: paused; }
+  @keyframes evoShake {
+    0%   { translate: -2px 0; }
+    25%  { translate: 2px 0; }
+    50%  { translate: -2px 0; }
+    75%  { translate: 3px 0; }
+    100% { translate: -2px 0; }
+  }
+  @keyframes evoWhiten {
+    0%   { filter: none; transform: scale(1); }
+    20%  { filter: brightness(1.4) saturate(0.8) drop-shadow(0 0 10px #fff); transform: scale(1.02); }
+    40%  { filter: brightness(3) saturate(0.2) drop-shadow(0 0 18px #fff); transform: scale(1.05); }
+    55%  { filter: brightness(12) saturate(0) drop-shadow(0 0 30px #fff); transform: scale(1.1); }
+    70%  { filter: brightness(12) saturate(0) drop-shadow(0 0 30px #fff); transform: scale(1.18); }
+    80%  { filter: brightness(8) saturate(0) drop-shadow(0 0 24px #fff); transform: scale(1.2); opacity: 0; }
+    81%  { opacity: 0; }
+    100% { filter: none; transform: scale(1); opacity: 0; }
+  }
+  /* During the back half of the flash, swap to evolved owl */
+  body.evo-running .owl.evolved-form { display: block; animation: evoReveal 3.2s ease-in-out forwards; }
+  @keyframes evoReveal {
+    0%, 70%   { opacity: 0; filter: brightness(12) saturate(0); transform: scale(0.85); }
+    80%       { opacity: 1; filter: brightness(8) saturate(0.2); transform: scale(1.05); }
+    90%       { opacity: 1; filter: brightness(2) saturate(0.7); transform: scale(1.02); }
+    100%      { opacity: 1; filter: none; transform: scale(1); }
+  }
+
+  /* =================== EVOLUTION TEST BUTTON =================== */
+  .evo-test {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .evo-btn {
+    appearance: none;
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fff;
+    border: none;
+    padding: 9px 16px 8px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #facc15 0%, #f59e0b 60%, #b45309 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.55),
+      inset 0 -3px 0 #78350f,
+      0 4px 0 rgba(0,0,0,0.25),
+      0 8px 16px -4px rgba(245, 158, 11, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+  }
+  .evo-btn:hover { transform: translateY(1px); }
+  .evo-btn:active {
+    transform: translateY(3px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.4),
+      inset 0 -1px 0 #78350f,
+      0 1px 0 rgba(0,0,0,0.25);
+  }
+  .evo-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .evo-btn.reset {
+    background: linear-gradient(180deg, #4b5563 0%, #374151 60%, #1f2937 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.25),
+      inset 0 -3px 0 #111827,
+      0 4px 0 rgba(0,0,0,0.25);
+  }
+  .evo-btn .star {
+    width: 14px; height: 14px; display: inline-block;
+  }
+  body.night .evo-btn.reset { color: #e5e7eb; }
+</style>
+</head>
+<body>
+
+<div class="device" aria-label="PoketGochi">
+  <button class="exit-btn" id="exitBtn" title="Cerrar">×</button>
+  <span class="brand">POKETGOCHI</span>
+  <span class="led"></span>
+
+  <div class="screen" id="screen">
+
+    <div class="hud">
+      <div class="stats" id="stats">
+        <div class="stat"><span class="label">♥</span><div class="meter" data-meter="happy"></div></div>
+        <div class="stat"><span class="label">⌇</span><div class="meter" data-meter="hunger"></div></div>
+        <div class="stat"><span class="label">☾</span><div class="meter" data-meter="energy"></div></div>
+      </div>
+      <div class="right-hud">
+        <div class="clock" id="clock">00:00</div>
+        <div class="coins" id="coins">🪙 <span>0</span></div>
+      </div>
+    </div>
+
+    <div class="bubble" id="bubble">¡hola!</div>
+    <div class="z-stack" id="zzz"><span>Z</span><span>Z</span><span>Z</span></div>
+    <div class="swirl" id="swirl">@</div>
+    <div class="hearts" id="hearts"></div>
+    <div class="crumbs" id="crumbs"></div>
+
+    <div class="stage">
+      <!-- Record Player Item -->
+      <svg id="item-recordplayer" style="display:none; position:absolute; bottom: 22px; left: 20px; width: 60px; height: 60px; z-index: 3;" viewBox="0 0 100 100">
+        <rect x="10" y="40" width="80" height="30" rx="4" fill="#78350f" stroke="#451a03" stroke-width="3"/>
+        <rect x="10" y="40" width="80" height="8" fill="#92400e"/>
+        <ellipse cx="45" cy="40" rx="30" ry="8" fill="#171717" stroke="#404040" stroke-width="2"/>
+        <ellipse cx="45" cy="38" rx="26" ry="6" fill="#0a0a0a"/>
+        <ellipse cx="45" cy="38" rx="8" ry="2" fill="#ef4444"/>
+        <path d="M80 45 L75 30 L55 35" stroke="#d4d4d8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="80" cy="45" r="4" fill="#a1a1aa"/>
+        <text x="35" y="20" fill="#fcd34d" font-size="28" class="music-note" style="opacity:0">♪</text>
+      </svg>
+
+      <!-- Guitar Item -->
+      <svg id="item-guitar" style="display:none; position:absolute; bottom: 22px; right: 20px; width: 45px; height: 80px; z-index: 4;" viewBox="0 0 60 100">
+        <g transform="rotate(15 30 50)">
+          <!-- neck -->
+          <rect x="26" y="10" width="8" height="50" fill="#262626" />
+          <!-- headstock -->
+          <path d="M24 10 L36 10 L34 0 L26 0 Z" fill="#b91c1c" />
+          <!-- tuning pegs -->
+          <circle cx="22" cy="4" r="1.5" fill="#e5e5e5" />
+          <circle cx="22" cy="8" r="1.5" fill="#e5e5e5" />
+          <circle cx="38" cy="4" r="1.5" fill="#e5e5e5" />
+          <circle cx="38" cy="8" r="1.5" fill="#e5e5e5" />
+          <!-- body -->
+          <path d="M15 50 C 5 50, 5 70, 15 80 C 15 95, 45 95, 45 80 C 55 70, 55 50, 45 50 C 35 50, 35 60, 30 60 C 25 60, 25 50, 15 50 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2" />
+          <!-- pickguard -->
+          <path d="M20 60 C 20 70, 40 70, 40 60 Z" fill="#ffffff" />
+          <!-- pickups -->
+          <rect x="25" y="65" width="10" height="3" fill="#171717" />
+          <rect x="25" y="72" width="10" height="3" fill="#171717" />
+          <!-- bridge -->
+          <rect x="23" y="82" width="14" height="5" fill="#a3a3a3" />
+        </g>
+        <text x="5" y="20" fill="#ef4444" font-size="28" class="music-note" style="opacity:0; animation-delay:1.2s;">⚡</text>
+      </svg>
+
+      <svg class="owl base-form" id="owl" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bodyG" cx="0.45" cy="0.32" r="0.95">
+            <stop offset="0%" stop-color="#b88555"/>
+            <stop offset="50%" stop-color="#8a572d"/>
+            <stop offset="100%" stop-color="#4a2e15"/>
+          </radialGradient>
+          <radialGradient id="bodyDarkG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#7a4a22"/>
+            <stop offset="100%" stop-color="#3d2410"/>
+          </radialGradient>
+          <radialGradient id="bellyG" cx="0.5" cy="0.45" r="0.7">
+            <stop offset="0%" stop-color="#f3d8a5"/>
+            <stop offset="60%" stop-color="#d8aa6e"/>
+            <stop offset="100%" stop-color="#b88554"/>
+          </radialGradient>
+          <radialGradient id="faceG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#fff2d4"/>
+            <stop offset="70%" stop-color="#ecca94"/>
+            <stop offset="100%" stop-color="#c8995e"/>
+          </radialGradient>
+          <radialGradient id="irisG" cx="0.5" cy="0.4" r="0.65">
+            <stop offset="0%" stop-color="#7dc3ff"/>
+            <stop offset="40%" stop-color="#2e7adc"/>
+            <stop offset="78%" stop-color="#0e2c70"/>
+            <stop offset="100%" stop-color="#040b2a"/>
+          </radialGradient>
+          <radialGradient id="irisRimG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="80%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#0a1a4a"/>
+          </radialGradient>
+          <linearGradient id="beakG" x1="0.3" y1="0" x2="0.7" y2="1">
+            <stop offset="0%" stop-color="#ffd96a"/>
+            <stop offset="50%" stop-color="#f0a830"/>
+            <stop offset="100%" stop-color="#c66a0e"/>
+          </linearGradient>
+          <linearGradient id="beakShadeG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#7a3a06" stop-opacity="0.5"/>
+          </linearGradient>
+          <linearGradient id="footG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffb56a"/>
+            <stop offset="100%" stop-color="#d77a1f"/>
+          </linearGradient>
+          <radialGradient id="cheekG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ff9b7a" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#ff9b7a" stop-opacity="0"/>
+          </radialGradient>
+          <!-- soft scale pattern for feather flecks -->
+          <pattern id="feathPat" x="0" y="0" width="14" height="11" patternUnits="userSpaceOnUse">
+            <path d="M0 6 Q7 0 14 6" stroke="#5c3818" stroke-width="0.9" fill="none" opacity="0.35"/>
+            <path d="M7 11 Q14 5 21 11" stroke="#5c3818" stroke-width="0.9" fill="none" opacity="0.35"/>
+          </pattern>
+          <pattern id="bellyPat" x="0" y="0" width="14" height="11" patternUnits="userSpaceOnUse">
+            <path d="M3 5 Q7 1 11 5 Q7 8 3 5 Z" fill="#a76d28" opacity="0.32"/>
+          </pattern>
+        </defs>
+
+        <!-- ground shadow -->
+        <ellipse cx="150" cy="308" rx="78" ry="8" fill="rgba(0,0,0,0.22)"/>
+
+        <g class="breathe">
+
+          <!-- =============== TAIL FEATHERS (drawn behind body, fanning down/out) =============== -->
+          <g class="tail">
+            <g transform="rotate(-38 150 270)">
+              <path d="M150 270 Q 136 295 140 340 Q 150 354 160 340 Q 164 295 150 270 Z"
+                    fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 336" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(-19 150 270)">
+              <path d="M150 270 Q 136 295 140 344 Q 150 358 160 344 Q 164 295 150 270 Z"
+                    fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 340" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g>
+              <path d="M150 270 Q 136 295 140 346 Q 150 360 160 346 Q 164 295 150 270 Z"
+                    fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 342" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(19 150 270)">
+              <path d="M150 270 Q 136 295 140 344 Q 150 358 160 344 Q 164 295 150 270 Z"
+                    fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 340" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(38 150 270)">
+              <path d="M150 270 Q 136 295 140 340 Q 150 354 160 340 Q 164 295 150 270 Z"
+                    fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 336" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+          </g>
+
+          <!-- =============== FEET (talons) =============== -->
+          <g>
+            <!-- left foot -->
+            <g>
+              <!-- base pad -->
+              <ellipse cx="123" cy="294" rx="20" ry="9" fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6"/>
+              <!-- three toes -->
+              <g fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6" stroke-linejoin="round">
+                <path d="M108 295 q-4 4 -3 9 q1 3 5 3 q4 0 6 -3 q1 -4 0 -8 z"/>
+                <path d="M122 297 q-3 5 -2 10 q1 3 5 3 q4 0 5 -3 q1 -5 -1 -10 z"/>
+                <path d="M136 295 q3 4 4 9 q0 3 -4 3 q-4 0 -6 -3 q-2 -4 -1 -8 z"/>
+              </g>
+              <!-- talons -->
+              <path d="M108 307 q1 5 -1 8 q-3 -1 -4 -4 q0 -3 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M125 309 q1 5 -1 8 q-3 -1 -3 -5 q0 -2 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M141 307 q0 5 -3 7 q-3 -1 -3 -4 q1 -3 2 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <!-- texture lines -->
+              <path d="M115 297 q4 2 8 0 M117 301 q3 2 7 0" stroke="#7a3a06" stroke-width="0.8" fill="none" opacity="0.7"/>
+            </g>
+            <!-- right foot -->
+            <g>
+              <ellipse cx="177" cy="294" rx="20" ry="9" fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6"/>
+              <g fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6" stroke-linejoin="round">
+                <path d="M162 295 q-4 4 -3 9 q1 3 5 3 q4 0 6 -3 q1 -4 0 -8 z"/>
+                <path d="M176 297 q-3 5 -2 10 q1 3 5 3 q4 0 5 -3 q1 -5 -1 -10 z"/>
+                <path d="M190 295 q3 4 4 9 q0 3 -4 3 q-4 0 -6 -3 q-2 -4 -1 -8 z"/>
+              </g>
+              <path d="M162 307 q1 5 -1 8 q-3 -1 -4 -4 q0 -3 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M179 309 q1 5 -1 8 q-3 -1 -3 -5 q0 -2 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M195 307 q0 5 -3 7 q-3 -1 -3 -4 q1 -3 2 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M169 297 q4 2 8 0 M171 301 q3 2 7 0" stroke="#7a3a06" stroke-width="0.8" fill="none" opacity="0.7"/>
+            </g>
+          </g>
+
+          <!-- =============== BODY =============== -->
+          <g>
+            <!-- main silhouette -->
+            <path d="M48 178
+                     C 30 70, 270 70, 252 178
+                     C 268 260, 222 296, 150 296
+                     C 78 296, 32 260, 48 178 Z"
+                  fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.5"/>
+            <!-- feather scale texture overlay (back/dark) -->
+            <path d="M48 178
+                     C 30 70, 270 70, 252 178
+                     C 268 260, 222 296, 150 296
+                     C 78 296, 32 260, 48 178 Z"
+                  fill="url(#feathPat)" opacity="0.8"/>
+            <!-- top head darker shading: feathers cap -->
+            <path d="M60 130
+                     C 50 70, 250 70, 240 130
+                     C 230 110, 210 95, 180 95
+                     C 165 90, 135 90, 120 95
+                     C 90 95, 70 110, 60 130 Z"
+                  fill="url(#bodyDarkG)" opacity="0.55"/>
+            <!-- crown feather flicks -->
+            <g stroke="#3d2410" stroke-width="1.4" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M120 78 q3 -8 6 0"/>
+              <path d="M134 73 q3 -8 6 0"/>
+              <path d="M150 71 q3 -8 6 0"/>
+              <path d="M166 73 q3 -8 6 0"/>
+              <path d="M180 78 q3 -8 6 0"/>
+              <path d="M100 88 q3 -8 6 0"/>
+              <path d="M194 88 q3 -8 6 0"/>
+            </g>
+
+            <!-- BELLY -->
+            <path d="M88 178
+                     C 78 115, 222 115, 212 178
+                     C 224 248, 184 286, 150 286
+                     C 116 286, 76 248, 88 178 Z"
+                  fill="url(#bellyG)" stroke="#a86d2a" stroke-width="1.4"/>
+            <path d="M88 178
+                     C 78 115, 222 115, 212 178
+                     C 224 248, 184 286, 150 286
+                     C 116 286, 76 248, 88 178 Z"
+                  fill="url(#bellyPat)" opacity="0.75"/>
+            <!-- belly center darker streak -->
+            <path d="M150 130 Q146 200, 150 270" stroke="#a76d28" stroke-width="2" fill="none" opacity="0.25"/>
+          </g>
+
+
+
+          <!-- =============== WINGS =============== -->
+          <g class="wing-left">
+            <!-- wing main shape (layered teardrop with feather tips) -->
+            <path d="M58 175
+                     C 22 175, 8 235, 36 282
+                     C 48 290, 70 282, 76 264
+                     C 84 240, 82 200, 70 178 Z"
+                  fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.4"/>
+            <!-- inner shading -->
+            <path d="M58 175
+                     C 22 175, 8 235, 36 282
+                     C 48 290, 70 282, 76 264
+                     C 84 240, 82 200, 70 178 Z"
+                  fill="url(#feathPat)" opacity="0.75"/>
+            <!-- primary feathers (overlapping arcs at the tip) -->
+            <g fill="#5c3818" stroke="#3d2410" stroke-width="1.4" stroke-linejoin="round" opacity="0.85">
+              <path d="M22 252 q-6 14 6 26 q10 6 18 -2 q-8 -10 -10 -22 q-6 -8 -14 -2 Z"/>
+              <path d="M30 268 q-2 14 12 22 q12 4 18 -6 q-10 -8 -14 -20 q-8 -6 -16 4 Z"/>
+              <path d="M44 278 q2 12 16 14 q10 0 14 -10 q-12 -4 -18 -14 q-8 -2 -12 10 Z"/>
+            </g>
+            <!-- feather flicks on shoulder -->
+            <g stroke="#3d2410" stroke-width="1.3" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M40 200 q9 -5 17 0"/>
+              <path d="M32 220 q10 -5 20 0"/>
+              <path d="M30 240 q10 -5 20 0"/>
+            </g>
+            <!-- highlight -->
+            <path d="M50 195 q-4 20 -4 40" stroke="#d8a978" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>
+          </g>
+
+          <g class="wing-right">
+            <path d="M242 175
+                     C 278 175, 292 235, 264 282
+                     C 252 290, 230 282, 224 264
+                     C 216 240, 218 200, 230 178 Z"
+                  fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.4"/>
+            <path d="M242 175
+                     C 278 175, 292 235, 264 282
+                     C 252 290, 230 282, 224 264
+                     C 216 240, 218 200, 230 178 Z"
+                  fill="url(#feathPat)" opacity="0.75"/>
+            <g fill="#5c3818" stroke="#3d2410" stroke-width="1.4" stroke-linejoin="round" opacity="0.85">
+              <path d="M278 252 q6 14 -6 26 q-10 6 -18 -2 q8 -10 10 -22 q6 -8 14 -2 Z"/>
+              <path d="M270 268 q2 14 -12 22 q-12 4 -18 -6 q10 -8 14 -20 q8 -6 16 4 Z"/>
+              <path d="M256 278 q-2 12 -16 14 q-10 0 -14 -10 q12 -4 18 -14 q8 -2 12 10 Z"/>
+            </g>
+            <g stroke="#3d2410" stroke-width="1.3" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M243 200 q9 -5 17 0"/>
+              <path d="M248 220 q10 -5 20 0"/>
+              <path d="M250 240 q10 -5 20 0"/>
+            </g>
+            <path d="M250 195 q4 20 4 40" stroke="#d8a978" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>
+          </g>
+
+          <!-- =============== FACE: TWO SEMICIRCLE PATCHES (low, hugging eyes) =============== -->
+          <g>
+            <!-- LEFT patch: starts just above eye, curves down around beak -->
+            <path d="M150 175
+                     Q 142 182 130 182
+                     Q 105 180 92 170
+                     Q 80 158 84 138
+                     Q 92 116 116 110
+                     Q 138 110 148 124
+                     Q 152 145 152 168
+                     Q 152 175 150 175 Z"
+                  fill="url(#faceG)" stroke="#a06a32" stroke-width="1.8"/>
+            <!-- RIGHT patch (mirror) -->
+            <path d="M150 175
+                     Q 158 182 170 182
+                     Q 195 180 208 170
+                     Q 220 158 216 138
+                     Q 208 116 184 110
+                     Q 162 110 152 124
+                     Q 148 145 148 168
+                     Q 148 175 150 175 Z"
+                  fill="url(#faceG)" stroke="#a06a32" stroke-width="1.8"/>
+            <!-- soft inner shading near edges -->
+            <g opacity="0.35" fill="none" stroke="#a86d2a" stroke-width="1">
+              <path d="M92 140 Q86 155 100 170"/>
+              <path d="M208 140 Q214 155 200 170"/>
+            </g>
+          </g>
+
+          <!-- =============== EYEBROWS (dark feather tufts above eyes) =============== -->
+          <g fill="#3d2410" stroke="#241407" stroke-width="1.2" stroke-linejoin="round">
+            <!-- left brow -->
+            <path d="M76 110
+                     Q 100 78 138 94
+                     Q 142 100 138 108
+                     Q 130 102 118 102
+                     Q 100 104 88 116
+                     Q 80 120 76 118 Z"/>
+            <!-- right brow -->
+            <path d="M224 110
+                     Q 200 78 162 94
+                     Q 158 100 162 108
+                     Q 170 102 182 102
+                     Q 200 104 212 116
+                     Q 220 120 224 118 Z"/>
+            <!-- brow texture flicks -->
+            <g stroke="#5c3818" stroke-width="1" fill="none" opacity="0.7" stroke-linecap="round">
+              <path d="M88 110 q2 -5 6 -3"/>
+              <path d="M102 100 q2 -5 6 -3"/>
+              <path d="M120 96 q2 -5 6 -3"/>
+              <path d="M192 96 q-2 -5 -6 -3"/>
+              <path d="M210 100 q-2 -5 -6 -3"/>
+              <path d="M196 110 q-2 -5 -6 -3"/>
+            </g>
+          </g>
+
+          <!-- =============== EYES (almond-shaped) =============== -->
+          <!-- LEFT EYE -->
+          <g>
+            <g class="eye-inner">
+              <!-- almond outline -->
+              <path d="M97 132
+                       Q 115 108 138 122
+                       Q 142 140 130 152
+                       Q 108 158 100 146
+                       Q 94 138 97 132 Z"
+                    fill="#1a0f04"/>
+              <!-- white sclera -->
+              <path d="M99 132
+                       Q 116 112 136 124
+                       Q 140 138 128 149
+                       Q 109 155 102 144
+                       Q 96 138 99 132 Z"
+                    fill="#ffffff"/>
+              <!-- iris -->
+              <ellipse cx="118" cy="135" rx="17" ry="18" fill="url(#irisG)"/>
+              <ellipse cx="118" cy="135" rx="17" ry="18" fill="url(#irisRimG)"/>
+              <g stroke="#06133a" stroke-width="0.6" fill="none" opacity="0.55">
+                <path d="M118 119 v6 M118 144 v6 M104 135 h6 M127 135 h6 M108 124 l4 4 M128 124 l-4 4 M108 145 l4 -4 M128 145 l-4 -4"/>
+              </g>
+              <!-- pupil -->
+              <ellipse cx="118" cy="136" rx="6" ry="9" fill="#040a22"/>
+              <ellipse cx="123" cy="127" rx="5" ry="6.5" fill="#ffffff"/>
+              <circle cx="112" cy="142" r="2.2" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <!-- eyelid: matches full almond shape so closed = covers eye -->
+            <path class="eyelid left"
+                  d="M97 132 Q 115 108 138 122 Q 142 140 130 152 Q 108 158 100 146 Q 94 138 97 132 Z"
+                  fill="#8d5a30" stroke="#3d2410" stroke-width="1.5"/>
+            <!-- lash line on closed lid -->
+            <path class="eyelash left"
+                  d="M99 144 Q 115 152 132 146"
+                  stroke="#3d2410" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <!-- RIGHT EYE -->
+          <g>
+            <g class="eye-inner">
+              <path d="M203 132
+                       Q 185 108 162 122
+                       Q 158 140 170 152
+                       Q 192 158 200 146
+                       Q 206 138 203 132 Z"
+                    fill="#1a0f04"/>
+              <path d="M201 132
+                       Q 184 112 164 124
+                       Q 160 138 172 149
+                       Q 191 155 198 144
+                       Q 204 138 201 132 Z"
+                    fill="#ffffff"/>
+              <ellipse cx="182" cy="135" rx="17" ry="18" fill="url(#irisG)"/>
+              <ellipse cx="182" cy="135" rx="17" ry="18" fill="url(#irisRimG)"/>
+              <g stroke="#06133a" stroke-width="0.6" fill="none" opacity="0.55">
+                <path d="M182 119 v6 M182 144 v6 M168 135 h6 M191 135 h6 M172 124 l4 4 M192 124 l-4 4 M172 145 l4 -4 M192 145 l-4 -4"/>
+              </g>
+              <ellipse cx="182" cy="136" rx="6" ry="9" fill="#040a22"/>
+              <ellipse cx="187" cy="127" rx="5" ry="6.5" fill="#ffffff"/>
+              <circle cx="176" cy="142" r="2.2" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <path class="eyelid right"
+                  d="M203 132 Q 185 108 162 122 Q 158 140 170 152 Q 192 158 200 146 Q 206 138 203 132 Z"
+                  fill="#8d5a30" stroke="#3d2410" stroke-width="1.5"/>
+            <path class="eyelash right"
+                  d="M168 146 Q 185 152 201 144"
+                  stroke="#3d2410" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <!-- soft cheeks (subtle, behind beak) -->
+          <ellipse cx="106" cy="170" rx="9" ry="5" fill="url(#cheekG)"/>
+          <ellipse cx="194" cy="170" rx="9" ry="5" fill="url(#cheekG)"/>
+
+          <!-- =============== BEAK (hooked, dimensional) =============== -->
+          <g class="beak">
+            <!-- base shadow under beak -->
+            <ellipse cx="150" cy="180" rx="11" ry="3" fill="#7a3a06" opacity="0.35"/>
+            <!-- upper beak (curved hook) -->
+            <path d="M139 159
+                     Q 150 156 161 159
+                     Q 164 168 158 178
+                     Q 153 188 150 192
+                     Q 147 188 142 178
+                     Q 136 168 139 159 Z"
+                  fill="url(#beakG)" stroke="#7a3a06" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- right-side shadow on beak for dimensionality -->
+            <path d="M150 161
+                     Q 158 162 161 167
+                     Q 164 175 158 184
+                     Q 153 190 150 192 Z"
+                  fill="url(#beakShadeG)" opacity="0.7"/>
+            <!-- nostril -->
+            <ellipse cx="146" cy="166" rx="1.3" ry="0.9" fill="#7a3a06"/>
+            <!-- highlight -->
+            <path d="M144 163 Q 146 168 145 174" stroke="#fff2c8" stroke-width="1.2" fill="none" opacity="0.7" stroke-linecap="round"/>
+            <!-- mouth (animates open/close) -->
+            <g class="beak-bottom-grp">
+              <path d="M143 174
+                       Q 150 184 157 174
+                       Q 156 184 150 188
+                       Q 144 184 143 174 Z"
+                    fill="#8a1414" stroke="#4a0808" stroke-width="1.2"/>
+              <ellipse cx="150" cy="180" rx="2.2" ry="1" fill="#ffb4b4" opacity="0.7"/>
+            </g>
+          </g>
+
+          <!-- =============== HEADPHONES (item) =============== -->
+          <g id="item-headphones" style="display: none;">
+            <path d="M70 120 C 70 50, 230 50, 230 120" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M70 120 C 70 50, 230 50, 230 120" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="65" cy="120" rx="12" ry="18" fill="#15803d" stroke="#14532d" stroke-width="2"/>
+            <ellipse cx="65" cy="120" rx="6" ry="12" fill="#22c55e"/>
+            <ellipse cx="235" cy="120" rx="12" ry="18" fill="#15803d" stroke="#14532d" stroke-width="2"/>
+            <ellipse cx="235" cy="120" rx="6" ry="12" fill="#22c55e"/>
+          </g>
+
+          <!-- =============== GLASSES (item) =============== -->
+          <g id="item-glasses" style="display: none;" fill="none" stroke="#404040" stroke-width="3" stroke-linecap="round">
+            <path d="M144 132 Q150 125 156 132" stroke-width="2" />
+            <rect x="88" y="118" width="56" height="32" rx="10" />
+            <rect x="156" y="118" width="56" height="32" rx="10" />
+            <path d="M88 125 L75 120" stroke-width="2" />
+            <path d="M212 125 L225 120" stroke-width="2" />
+          </g>
+
+        </g>
+      </svg>
+
+      <!-- =================== EVOLVED OWL =================== -->
+      <svg class="owl evolved-form" id="owl-evolved" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="evoBodyG" cx="0.45" cy="0.32" r="0.95">
+            <stop offset="0%" stop-color="#8a5a2a"/>
+            <stop offset="50%" stop-color="#5c3818"/>
+            <stop offset="100%" stop-color="#241407"/>
+          </radialGradient>
+          <radialGradient id="evoBodyDarkG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#4a2e15"/>
+            <stop offset="100%" stop-color="#1a0d04"/>
+          </radialGradient>
+          <radialGradient id="evoBellyG" cx="0.5" cy="0.45" r="0.7">
+            <stop offset="0%" stop-color="#d8b070"/>
+            <stop offset="60%" stop-color="#a87530"/>
+            <stop offset="100%" stop-color="#6e4818"/>
+          </radialGradient>
+          <radialGradient id="evoFaceG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#f0d8a0"/>
+            <stop offset="70%" stop-color="#c8985a"/>
+            <stop offset="100%" stop-color="#7a4a20"/>
+          </radialGradient>
+          <radialGradient id="evoIrisG" cx="0.5" cy="0.4" r="0.65">
+            <stop offset="0%" stop-color="#fff0a0"/>
+            <stop offset="30%" stop-color="#fbbf24"/>
+            <stop offset="70%" stop-color="#c2410c"/>
+            <stop offset="100%" stop-color="#3a0a02"/>
+          </radialGradient>
+          <radialGradient id="evoIrisRimG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="80%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#3a0a02"/>
+          </radialGradient>
+          <linearGradient id="evoBeakG" x1="0.3" y1="0" x2="0.7" y2="1">
+            <stop offset="0%" stop-color="#ffd060"/>
+            <stop offset="50%" stop-color="#e89420"/>
+            <stop offset="100%" stop-color="#8a4a08"/>
+          </linearGradient>
+          <linearGradient id="evoFootG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e89420"/>
+            <stop offset="100%" stop-color="#8a4a08"/>
+          </linearGradient>
+          <pattern id="evoFeathPat" x="0" y="0" width="12" height="9" patternUnits="userSpaceOnUse">
+            <path d="M0 5 Q6 0 12 5" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M6 9 Q12 4 18 9" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.5"/>
+          </pattern>
+          <pattern id="evoBellyPat" x="0" y="0" width="12" height="10" patternUnits="userSpaceOnUse">
+            <path d="M3 4 Q6 0 9 4 Q6 7 3 4 Z" fill="#6e4818" opacity="0.4"/>
+          </pattern>
+          <filter id="evoGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- ground shadow (wider — bigger owl) -->
+        <ellipse cx="150" cy="320" rx="95" ry="9" fill="rgba(0,0,0,0.32)"/>
+
+        <g class="breathe">
+
+          <!-- ============ TAIL — 7 longer feathers ============ -->
+          <g class="tail">
+            <g transform="rotate(-55 150 280)">
+              <path d="M150 280 Q 134 312 138 360 Q 150 376 162 360 Q 166 312 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 354" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g transform="rotate(-36 150 280)">
+              <path d="M150 280 Q 134 314 138 366 Q 150 382 162 366 Q 166 314 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 360" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g transform="rotate(-18 150 280)">
+              <path d="M150 280 Q 134 316 138 372 Q 150 388 162 372 Q 166 316 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 366" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g>
+              <path d="M150 280 Q 134 318 138 376 Q 150 392 162 376 Q 166 318 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 328 150 372" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g transform="rotate(18 150 280)">
+              <path d="M150 280 Q 134 316 138 372 Q 150 388 162 372 Q 166 316 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 366" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g transform="rotate(36 150 280)">
+              <path d="M150 280 Q 134 314 138 366 Q 150 382 162 366 Q 166 314 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 360" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+            <g transform="rotate(55 150 280)">
+              <path d="M150 280 Q 134 312 138 360 Q 150 376 162 360 Q 166 312 150 280 Z"
+                    fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M150 296 Q 148 326 150 354" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.6"/>
+            </g>
+          </g>
+
+          <!-- ============ FEET — longer sharper talons ============ -->
+          <g>
+            <g>
+              <ellipse cx="120" cy="298" rx="22" ry="10" fill="url(#evoFootG)" stroke="#4a1c02" stroke-width="1.8"/>
+              <g fill="url(#evoFootG)" stroke="#4a1c02" stroke-width="1.8" stroke-linejoin="round">
+                <path d="M103 299 q-5 4 -4 10 q1 4 6 4 q5 0 7 -4 q1 -4 0 -9 z"/>
+                <path d="M118 301 q-3 5 -2 11 q1 4 6 4 q5 0 6 -4 q1 -6 -1 -11 z"/>
+                <path d="M134 299 q3 4 4 10 q0 4 -5 4 q-5 0 -7 -4 q-2 -4 -1 -9 z"/>
+              </g>
+              <!-- LONGER curved talons -->
+              <path d="M101 311 q-1 9 -4 14 q-4 -1 -5 -6 q0 -5 2 -9 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <path d="M120 314 q1 10 -2 14 q-4 -1 -5 -7 q0 -4 1 -7 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <path d="M141 311 q0 9 -4 13 q-4 -1 -4 -6 q1 -5 3 -8 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <!-- talon highlight -->
+              <path d="M99 314 q-1 5 -3 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+              <path d="M119 317 q1 5 0 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+              <path d="M141 314 q0 5 -2 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+            </g>
+            <g>
+              <ellipse cx="180" cy="298" rx="22" ry="10" fill="url(#evoFootG)" stroke="#4a1c02" stroke-width="1.8"/>
+              <g fill="url(#evoFootG)" stroke="#4a1c02" stroke-width="1.8" stroke-linejoin="round">
+                <path d="M163 299 q-5 4 -4 10 q1 4 6 4 q5 0 7 -4 q1 -4 0 -9 z"/>
+                <path d="M178 301 q-3 5 -2 11 q1 4 6 4 q5 0 6 -4 q1 -6 -1 -11 z"/>
+                <path d="M194 299 q3 4 4 10 q0 4 -5 4 q-5 0 -7 -4 q-2 -4 -1 -9 z"/>
+              </g>
+              <path d="M161 311 q-1 9 -4 14 q-4 -1 -5 -6 q0 -5 2 -9 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <path d="M180 314 q1 10 -2 14 q-4 -1 -5 -7 q0 -4 1 -7 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <path d="M201 311 q0 9 -4 13 q-4 -1 -4 -6 q1 -5 3 -8 z" fill="#0a0402" stroke="#000" stroke-width="0.8"/>
+              <path d="M159 314 q-1 5 -3 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+              <path d="M179 317 q1 5 0 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+              <path d="M201 314 q0 5 -2 8" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5"/>
+            </g>
+          </g>
+
+          <!-- ============ EAR TUFTS — taller horned-owl crest ============ -->
+          <g class="ear-tufts">
+            <!-- left tuft (raised peak) -->
+            <path d="M82 96
+                     Q 56 -6 90 24
+                     Q 102 56 104 98
+                     Q 96 102 88 102
+                     Q 82 102 82 96 Z"
+                  fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+            <g stroke="#0a0402" stroke-width="1" fill="none" opacity="0.85" stroke-linecap="round">
+              <path d="M82 44 q5 10 10 26"/>
+              <path d="M88 28 q4 14 8 36"/>
+              <path d="M94 18 q2 16 6 40"/>
+            </g>
+            <!-- right tuft -->
+            <path d="M218 96
+                     Q 244 -6 210 24
+                     Q 198 56 196 98
+                     Q 204 102 212 102
+                     Q 218 102 218 96 Z"
+                  fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2" stroke-linejoin="round"/>
+            <g stroke="#0a0402" stroke-width="1" fill="none" opacity="0.85" stroke-linecap="round">
+              <path d="M218 44 q-5 10 -10 26"/>
+              <path d="M212 28 q-4 14 -8 36"/>
+              <path d="M206 18 q-2 16 -6 40"/>
+            </g>
+          </g>
+
+          <!-- ============ BODY — denser feather pattern ============ -->
+          <g>
+            <path d="M42 184
+                     C 22 70, 278 70, 258 184
+                     C 274 268, 224 304, 150 304
+                     C 76 304, 26 268, 42 184 Z"
+                  fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2.8"/>
+            <path d="M42 184
+                     C 22 70, 278 70, 258 184
+                     C 274 268, 224 304, 150 304
+                     C 76 304, 26 268, 42 184 Z"
+                  fill="url(#evoFeathPat)" opacity="0.9"/>
+            <!-- darker cap -->
+            <path d="M58 134
+                     C 48 70, 252 70, 242 134
+                     C 232 114, 210 96, 180 94
+                     C 165 88, 135 88, 120 94
+                     C 90 96, 68 114, 58 134 Z"
+                  fill="url(#evoBodyDarkG)" opacity="0.7"/>
+            <!-- denser crown feather flicks -->
+            <g stroke="#1a0d04" stroke-width="1.6" fill="none" opacity="0.85" stroke-linecap="round">
+              <path d="M106 86 q3 -9 6 0"/>
+              <path d="M118 78 q3 -9 6 0"/>
+              <path d="M132 72 q3 -10 6 0"/>
+              <path d="M148 70 q3 -10 6 0"/>
+              <path d="M166 72 q3 -10 6 0"/>
+              <path d="M180 78 q3 -9 6 0"/>
+              <path d="M192 86 q3 -9 6 0"/>
+              <path d="M96 96 q3 -8 6 0"/>
+              <path d="M204 96 q3 -8 6 0"/>
+            </g>
+            <!-- back feather rows (extra detail) -->
+            <g stroke="#1a0d04" stroke-width="1.1" fill="none" opacity="0.6" stroke-linecap="round">
+              <path d="M70 156 q8 -6 16 0"/>
+              <path d="M86 162 q8 -6 16 0"/>
+              <path d="M214 156 q8 -6 16 0"/>
+              <path d="M198 162 q8 -6 16 0"/>
+              <path d="M58 196 q9 -6 18 0"/>
+              <path d="M76 204 q9 -6 18 0"/>
+              <path d="M222 196 q9 -6 18 0"/>
+              <path d="M204 204 q9 -6 18 0"/>
+              <path d="M50 240 q9 -5 18 0"/>
+              <path d="M232 240 q9 -5 18 0"/>
+            </g>
+
+            <!-- BELLY -->
+            <path d="M84 184
+                     C 76 116, 224 116, 216 184
+                     C 226 256, 184 294, 150 294
+                     C 116 294, 74 256, 84 184 Z"
+                  fill="url(#evoBellyG)" stroke="#6e4818" stroke-width="1.6"/>
+            <path d="M84 184
+                     C 76 116, 224 116, 216 184
+                     C 226 256, 184 294, 150 294
+                     C 116 294, 74 256, 84 184 Z"
+                  fill="url(#evoBellyPat)" opacity="0.85"/>
+            <path d="M150 134 Q146 204, 150 276" stroke="#6e4818" stroke-width="2.2" fill="none" opacity="0.3"/>
+            <!-- chest feather V markings -->
+            <g stroke="#6e4818" stroke-width="1.4" fill="none" opacity="0.6" stroke-linecap="round">
+              <path d="M124 170 q6 6 12 0"/>
+              <path d="M164 170 q6 6 12 0"/>
+              <path d="M118 200 q8 8 16 0"/>
+              <path d="M166 200 q8 8 16 0"/>
+              <path d="M118 232 q8 8 16 0"/>
+              <path d="M166 232 q8 8 16 0"/>
+              <path d="M134 260 q8 8 16 0"/>
+              <path d="M150 260 q8 8 16 0"/>
+            </g>
+          </g>
+
+          <!-- ============ WINGS (with extra feather rows) ============ -->
+          <g class="wing-left">
+            <path d="M52 180
+                     C 14 180, 0 244, 30 292
+                     C 44 300, 68 292, 74 272
+                     C 84 246, 80 200, 68 180 Z"
+                  fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2.6"/>
+            <path d="M52 180
+                     C 14 180, 0 244, 30 292
+                     C 44 300, 68 292, 74 272
+                     C 84 246, 80 200, 68 180 Z"
+                  fill="url(#evoFeathPat)" opacity="0.85"/>
+            <g fill="#3d2410" stroke="#1a0d04" stroke-width="1.6" stroke-linejoin="round" opacity="0.95">
+              <path d="M14 258 q-7 16 6 30 q11 6 20 -2 q-9 -11 -11 -25 q-6 -8 -15 -3 Z"/>
+              <path d="M24 276 q-2 16 13 25 q13 4 20 -7 q-11 -9 -15 -23 q-9 -6 -18 5 Z"/>
+              <path d="M40 286 q2 13 17 16 q11 0 16 -11 q-13 -4 -19 -16 q-9 -2 -14 11 Z"/>
+            </g>
+            <g stroke="#1a0d04" stroke-width="1.4" fill="none" opacity="0.85" stroke-linecap="round">
+              <path d="M36 200 q9 -5 17 0"/>
+              <path d="M28 220 q10 -5 20 0"/>
+              <path d="M26 240 q10 -5 20 0"/>
+              <path d="M28 260 q10 -5 20 0"/>
+            </g>
+          </g>
+          <g class="wing-right">
+            <path d="M248 180
+                     C 286 180, 300 244, 270 292
+                     C 256 300, 232 292, 226 272
+                     C 216 246, 220 200, 232 180 Z"
+                  fill="url(#evoBodyG)" stroke="#1a0d04" stroke-width="2.6"/>
+            <path d="M248 180
+                     C 286 180, 300 244, 270 292
+                     C 256 300, 232 292, 226 272
+                     C 216 246, 220 200, 232 180 Z"
+                  fill="url(#evoFeathPat)" opacity="0.85"/>
+            <g fill="#3d2410" stroke="#1a0d04" stroke-width="1.6" stroke-linejoin="round" opacity="0.95">
+              <path d="M286 258 q7 16 -6 30 q-11 6 -20 -2 q9 -11 11 -25 q6 -8 15 -3 Z"/>
+              <path d="M276 276 q2 16 -13 25 q-13 4 -20 -7 q11 -9 15 -23 q9 -6 18 5 Z"/>
+              <path d="M260 286 q-2 13 -17 16 q-11 0 -16 -11 q13 -4 19 -16 q9 -2 14 11 Z"/>
+            </g>
+            <g stroke="#1a0d04" stroke-width="1.4" fill="none" opacity="0.85" stroke-linecap="round">
+              <path d="M247 200 q9 -5 17 0"/>
+              <path d="M252 220 q10 -5 20 0"/>
+              <path d="M254 240 q10 -5 20 0"/>
+              <path d="M252 260 q10 -5 20 0"/>
+            </g>
+          </g>
+
+          <!-- ============ FACE PATCHES ============ -->
+          <g>
+            <path d="M150 178
+                     Q 142 186 130 186
+                     Q 102 184 88 172
+                     Q 76 158 80 134
+                     Q 88 110 116 104
+                     Q 138 104 148 122
+                     Q 152 145 152 170
+                     Q 152 178 150 178 Z"
+                  fill="url(#evoFaceG)" stroke="#7a4a20" stroke-width="2"/>
+            <path d="M150 178
+                     Q 158 186 170 186
+                     Q 198 184 212 172
+                     Q 224 158 220 134
+                     Q 212 110 184 104
+                     Q 162 104 152 122
+                     Q 148 145 148 170
+                     Q 148 178 150 178 Z"
+                  fill="url(#evoFaceG)" stroke="#7a4a20" stroke-width="2"/>
+            <g opacity="0.45" fill="none" stroke="#6e4818" stroke-width="1.2">
+              <path d="M88 142 Q82 156 96 172"/>
+              <path d="M212 142 Q218 156 204 172"/>
+            </g>
+          </g>
+
+          <!-- ============ EYES (still big, but lower lid lifted for angry squint) ============ -->
+          <!-- LEFT -->
+          <g>
+            <path d="M93 138
+                     Q 116 116 140 130
+                     Q 144 148 132 158
+                     Q 110 162 100 152
+                     Q 88 144 93 138 Z"
+                  fill="#0e0703"/>
+            <path d="M96 140
+                     Q 117 120 138 132
+                     Q 142 146 130 155
+                     Q 110 159 102 150
+                     Q 90 144 96 140 Z"
+                  fill="#ffffff"/>
+            <ellipse cx="118" cy="138" rx="18" ry="19" fill="url(#evoIrisG)"/>
+            <ellipse cx="118" cy="138" rx="18" ry="19" fill="url(#evoIrisRimG)"/>
+            <!-- angry lower lid: a wedge over the bottom of the eye -->
+            <path d="M96 152 Q 118 158 142 144 Q 144 158 130 158 Q 110 162 100 156 Q 92 152 96 152 Z"
+                  fill="#3d2410" stroke="#1a0d04" stroke-width="1.2" opacity="0.9"/>
+            <ellipse cx="118" cy="139" rx="6.5" ry="10" fill="#0a0402"/>
+            <ellipse cx="123" cy="129" rx="5.5" ry="7" fill="#ffffff"/>
+            <circle cx="112" cy="145" r="2.4" fill="#ffffff" opacity="0.95"/>
+            <!-- iris detail rays -->
+            <g stroke="#7a1a02" stroke-width="0.6" fill="none" opacity="0.6">
+              <path d="M118 122 v6 M118 146 v6 M104 138 h6 M127 138 h6"/>
+            </g>
+          </g>
+          <!-- RIGHT -->
+          <g>
+            <path d="M207 138
+                     Q 184 116 160 130
+                     Q 156 148 168 158
+                     Q 190 162 200 152
+                     Q 212 144 207 138 Z"
+                  fill="#0e0703"/>
+            <path d="M204 140
+                     Q 183 120 162 132
+                     Q 158 146 170 155
+                     Q 190 159 198 150
+                     Q 210 144 204 140 Z"
+                  fill="#ffffff"/>
+            <ellipse cx="182" cy="138" rx="18" ry="19" fill="url(#evoIrisG)"/>
+            <ellipse cx="182" cy="138" rx="18" ry="19" fill="url(#evoIrisRimG)"/>
+            <path d="M204 152 Q 182 158 158 144 Q 156 158 170 158 Q 190 162 200 156 Q 208 152 204 152 Z"
+                  fill="#3d2410" stroke="#1a0d04" stroke-width="1.2" opacity="0.9"/>
+            <ellipse cx="182" cy="139" rx="6.5" ry="10" fill="#0a0402"/>
+            <ellipse cx="187" cy="129" rx="5.5" ry="7" fill="#ffffff"/>
+            <circle cx="176" cy="145" r="2.4" fill="#ffffff" opacity="0.95"/>
+            <g stroke="#7a1a02" stroke-width="0.6" fill="none" opacity="0.6">
+              <path d="M182 122 v6 M182 146 v6 M168 138 h6 M191 138 h6"/>
+            </g>
+          </g>
+
+          <!-- ============ ANGRY V EYEBROWS (rendered AFTER eyes so they sit IN FRONT, lower over the eyes) ============ -->
+          <g fill="#0e0703" stroke="#000" stroke-width="1.5" stroke-linejoin="round" filter="url(#evoGlow)">
+            <!-- left brow: thick, slanted DOWN toward center (angry V), now hanging over the eye -->
+            <path d="M58 116
+                     Q 86 92 146 132
+                     Q 152 144 142 150
+                     Q 128 138 110 136
+                     Q 88 138 68 150
+                     Q 58 150 56 138
+                     Q 54 124 58 116 Z"/>
+            <!-- right brow (mirror) -->
+            <path d="M242 116
+                     Q 214 92 154 132
+                     Q 148 144 158 150
+                     Q 172 138 190 136
+                     Q 212 138 232 150
+                     Q 242 150 244 138
+                     Q 246 124 242 116 Z"/>
+          </g>
+          <g stroke="#3d2410" stroke-width="1.1" fill="none" opacity="0.75" stroke-linecap="round">
+            <path d="M70 130 q3 -6 8 -4"/>
+            <path d="M88 122 q3 -6 8 -4"/>
+            <path d="M112 122 q3 -6 8 -4"/>
+            <path d="M132 134 q3 -6 8 -4"/>
+            <path d="M188 122 q-3 -6 -8 -4"/>
+            <path d="M212 122 q-3 -6 -8 -4"/>
+            <path d="M230 130 q-3 -6 -8 -4"/>
+            <path d="M168 134 q-3 -6 -8 -4"/>
+          </g>
+
+          <!-- ============ BEAK — sharper, larger hook ============ -->
+          <g>
+            <ellipse cx="150" cy="184" rx="13" ry="3.5" fill="#3a0a02" opacity="0.45"/>
+            <path d="M136 160
+                     Q 150 156 164 160
+                     Q 168 170 161 184
+                     Q 155 196 150 202
+                     Q 145 196 139 184
+                     Q 132 170 136 160 Z"
+                  fill="url(#evoBeakG)" stroke="#4a1c02" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M150 162
+                     Q 159 163 163 169
+                     Q 167 178 161 188
+                     Q 156 196 150 202 Z"
+                  fill="#5a2a04" opacity="0.55"/>
+            <ellipse cx="146" cy="168" rx="1.4" ry="1" fill="#3a0a02"/>
+            <path d="M144 164 Q 146 170 144 178" stroke="#fff0c8" stroke-width="1.3" fill="none" opacity="0.7" stroke-linecap="round"/>
+            <!-- closed angry beak -->
+            <path d="M143 184 Q 150 188 157 184" stroke="#3a0a02" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </g>
+
+        </g>
+      </svg>
+
+      <!-- evolution flash + rays -->
+      <div class="evo-rays" id="evoRays"></div>
+      <div class="evo-flash" id="evoFlash"></div>
+
+      <div class="pet-name" id="petName">PIO</div>
+    </div>
+
+    <div class="ground"></div>
+  </div>
+</div>
+
+<!-- Buttons (outside device) -->
+<div class="buttons">
+  <button class="btn" data-action="feed">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 6 C 18 3, 23 4, 24 8 C 28 8, 30 12, 28 16 C 30 22, 24 28, 16 28 C 8 28, 2 22, 4 16 C 2 12, 4 8, 8 8 C 9 4, 14 3, 16 6 Z" fill="#e63946" stroke="#7a1a1a" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 6 C 17 4, 19 4, 20 6" stroke="#3a5a18" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <ellipse cx="11" cy="14" rx="2.5" ry="3" fill="#ff8c8c" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Comer</span>
+  </button>
+
+  <button class="btn" data-action="play">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="13" rx="9" ry="10" fill="#22c55e" stroke="#0f5a28" stroke-width="1.5"/>
+        <path d="M16 23 L14 27 L18 27 Z" fill="#0f5a28"/>
+        <path d="M16 27 Q13 29 14 30" stroke="#0f5a28" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="12" cy="9" rx="2.5" ry="3" fill="#86efac" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Jugar</span>
+  </button>
+
+  <button class="btn" data-action="sleep">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M22 6 C 14 6, 8 12, 8 20 C 8 24, 11 27, 15 27 C 23 27, 27 19, 25 11 C 24 8, 23 6, 22 6 Z" fill="#fde68a" stroke="#92400e" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="1.2" fill="#92400e"/>
+        <circle cx="18" cy="18" r="1" fill="#92400e"/>
+      </svg>
+    </span>
+    <span class="lbl">Dormir</span>
+  </button>
+
+  <button class="btn" data-action="clean">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="20" rx="9" ry="6" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1.5"/>
+        <path d="M16 11 Q13 6 16 4 Q19 6 16 11 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="1.2"/>
+        <circle cx="23" cy="10" r="2" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1"/>
+        <circle cx="9" cy="13" r="1.5" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1"/>
+        <ellipse cx="12" cy="18" rx="2" ry="1.2" fill="#fff" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Limpiar</span>
+  </button>
+
+  <button class="btn" data-action="shop">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M6 10 L26 10 L23 26 L9 26 Z" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M11 10 C 11 6, 21 6, 21 10" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="18" r="3" fill="#fcd34d"/>
+      </svg>
+    </span>
+    <span class="lbl">Tienda</span>
+  </button>
+</div>
+
+<!-- Shop Modal -->
+<div class="shop-modal" id="shopModal">
+  <div class="shop-content">
+    <div class="shop-header">
+      <h2>Tienda</h2>
+      <button class="close-btn" id="closeShop">×</button>
+    </div>
+    <div class="shop-items">
+      <div class="shop-item" id="shop-hp">
+        <div class="item-icon">🎧</div>
+        <div class="item-info">
+          <h3>Auriculares</h3>
+          <p>Felicidad baja 20% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('headphones', 30)">🪙 30</button>
+      </div>
+      <div class="shop-item" id="shop-rp">
+        <div class="item-icon">📻</div>
+        <div class="item-info">
+          <h3>Tocadiscos</h3>
+          <p>Felicidad baja 30% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('recordplayer', 60)">🪙 60</button>
+      </div>
+      <div class="shop-item" id="shop-gl">
+        <div class="item-icon">👓</div>
+        <div class="item-info">
+          <h3>Lentes de lectura</h3>
+          <p>Sueño baja 30% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('glasses', 90)">🪙 90</button>
+      </div>
+      <div class="shop-item" id="shop-cd">
+        <div class="item-icon">🍬</div>
+        <div class="item-info">
+          <h3>Caramelo</h3>
+          <p>Aumenta todos los estados en 2</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('candy', 10)">🪙 10</button>
+      </div>
+      <div class="shop-item" id="shop-gt">
+        <div class="item-icon">🎸</div>
+        <div class="item-info">
+          <h3>Guitarra eléctrica</h3>
+          <p>Monedas 30% más rápido</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('guitar', 300)">🪙 300</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="credit">v2.1 · PROTOTIPO · EVOLUTION TEST</div>
+
+<div class="evo-test">
+  <button class="evo-btn" id="evolveBtn" type="button" title="Test de evolución">
+    <svg class="star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2 L14.6 8.6 L21.6 9.2 L16.2 13.8 L18 20.6 L12 16.8 L6 20.6 L7.8 13.8 L2.4 9.2 L9.4 8.6 Z"/>
+    </svg>
+    Evolucionar
+  </button>
+  <button class="evo-btn reset" id="resetEvolveBtn" type="button" title="Volver al búho original">
+    Reset
+  </button>
+</div>
+
+<script>
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "petName": "PIO",
+  "speed": 1,
+  "night": true,
+  "autoHop": true
+}/*EDITMODE-END*/;
+
+const STATE = {
+  happy: 8, hunger: 6, energy: 7,
+  sleeping: false, excited: false, sick: false,
+  maxPips: 10,
+  coins: parseInt(localStorage.getItem('poketgochi_coins')) || 0
+};
+
+const INVENTORY = JSON.parse(localStorage.getItem('poketgochi_inv')) || { headphones: false, recordplayer: false, glasses: false, guitar: false };
+
+function updateInventoryUI() {
+  document.getElementById('item-headphones').style.display = INVENTORY.headphones ? 'block' : 'none';
+  document.getElementById('item-recordplayer').style.display = INVENTORY.recordplayer ? 'block' : 'none';
+  document.getElementById('item-glasses').style.display = INVENTORY.glasses ? 'block' : 'none';
+  document.getElementById('item-guitar').style.display = INVENTORY.guitar ? 'block' : 'none';
+
+  if(INVENTORY.headphones) {
+    const btn = document.querySelector('#shop-hp .buy-btn');
+    if(btn) { btn.textContent = 'Comprado'; btn.disabled = true; }
+  }
+  if(INVENTORY.recordplayer) {
+    const btn = document.querySelector('#shop-rp .buy-btn');
+    if(btn) { btn.textContent = 'Comprado'; btn.disabled = true; }
+  }
+  if(INVENTORY.glasses) {
+    const btn = document.querySelector('#shop-gl .buy-btn');
+    if(btn) { btn.textContent = 'Comprado'; btn.disabled = true; }
+  }
+  if(INVENTORY.guitar) {
+    const btn = document.querySelector('#shop-gt .buy-btn');
+    if(btn) { btn.textContent = 'Comprado'; btn.disabled = true; }
+  }
+}
+updateInventoryUI();
+
+function buyItem(item, price) {
+  if (item !== 'candy' && INVENTORY[item]) return;
+  if (STATE.coins >= price) {
+    STATE.coins -= price;
+    localStorage.setItem('poketgochi_coins', STATE.coins);
+    updateCoinsDisplay();
+
+    if (item === 'candy') {
+      STATE.happy = clamp(STATE.happy + 2);
+      STATE.hunger = clamp(STATE.hunger + 2);
+      STATE.energy = clamp(STATE.energy + 2);
+      renderMeters();
+      say("¡qué rico!", 1500);
+      pulseExcited(1200);
+    } else {
+      INVENTORY[item] = true;
+      localStorage.setItem('poketgochi_inv', JSON.stringify(INVENTORY));
+      updateInventoryUI();
+      say("¡gracias!", 1500);
+    }
+  } else {
+    say("¡no alcanza!", 1500);
+  }
+}
+
+function updateCoinsDisplay() {
+  const coinsSpan = document.querySelector('#coins span');
+  if (coinsSpan) {
+    coinsSpan.textContent = STATE.coins;
+  }
+}
+updateCoinsDisplay();
+
+let coinTimer = 0;
+setInterval(() => {
+  let speed = 1;
+  if (INVENTORY.guitar) speed = 1.3;
+  coinTimer += 1000 * speed;
+  if (coinTimer >= 20000) {
+    STATE.coins++;
+    coinTimer -= 20000;
+    localStorage.setItem('poketgochi_coins', STATE.coins);
+    updateCoinsDisplay();
+  }
+}, 1000);
+
+function renderMeters(){
+  document.querySelectorAll('[data-meter]').forEach(m => {
+    const key = m.dataset.meter;
+    const val = Math.round(STATE[key]);
+    let html = '';
+    for(let i=0;i<STATE.maxPips;i++){
+      let cls = 'pip';
+      if(i < val) cls += val <= 2 ? ' warn' : ' on';
+      html += `<div class="${cls}"></div>`;
+    }
+    m.innerHTML = html;
+  });
+}
+
+function tickClock(){
+  const d = new Date();
+  document.getElementById('clock').textContent =
+    `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+setInterval(tickClock, 1000); tickClock();
+
+let bubbleTimer;
+function say(text, dur = 1600){
+  const b = document.getElementById('bubble');
+  b.textContent = text;
+  b.classList.add('show');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => b.classList.remove('show'), dur);
+}
+
+const owl = document.getElementById('owl');
+function setStateClass(){
+  owl.classList.toggle('sleeping', STATE.sleeping);
+  owl.classList.toggle('excited', STATE.excited);
+  owl.classList.toggle('sick', STATE.sick);
+  document.getElementById('zzz').classList.toggle('show', STATE.sleeping);
+  document.getElementById('swirl').classList.toggle('show', STATE.sick);
+}
+const clamp = v => Math.max(0, Math.min(STATE.maxPips, v));
+
+function feed(){
+  if(STATE.sleeping){ say("zzz..."); return; }
+  STATE.hunger = clamp(STATE.hunger + 3);
+  STATE.happy = clamp(STATE.happy + 1);
+  spawnCrumbs(8);
+  say("¡ñam!");
+  pulseExcited(900);
+}
+function play(){
+  if(STATE.sleeping){ say("zzz..."); return; }
+  if(STATE.energy < 2){ say("...cansado"); return; }
+  STATE.happy = clamp(STATE.happy + 3);
+  STATE.energy = clamp(STATE.energy - 2);
+  STATE.hunger = clamp(STATE.hunger - 1);
+  spawnHearts(6);
+  say("¡yupi!");
+  pulseExcited(1400);
+}
+function sleep(){
+  STATE.sleeping = !STATE.sleeping;
+  if(STATE.sleeping) say("buenas noches", 1200);
+  else { say("¡buen día!", 1200); STATE.energy = clamp(STATE.energy + 3); }
+  setStateClass();
+}
+function clean(){
+  if(STATE.sleeping){ say("zzz..."); return; }
+  STATE.sick = false;
+  STATE.happy = clamp(STATE.happy + 1);
+  say("¡limpio!");
+  setStateClass();
+}
+function pulseExcited(dur){
+  STATE.excited = true; setStateClass();
+  setTimeout(() => { STATE.excited = false; setStateClass(); }, dur);
+}
+function spawnHearts(n){
+  const layer = document.getElementById('hearts');
+  for(let i=0;i<n;i++){
+    const h = document.createElement('div');
+    h.className = 'heart'; h.textContent = '♥';
+    h.style.left = (35 + Math.random()*30) + '%';
+    h.style.top = (50 + Math.random()*15) + '%';
+    h.style.animationDelay = (i*0.12) + 's';
+    layer.appendChild(h);
+    setTimeout(() => h.remove(), 2000);
+  }
+}
+function spawnCrumbs(n){
+  const layer = document.getElementById('crumbs');
+  for(let i=0;i<n;i++){
+    const c = document.createElement('div');
+    c.className = 'crumb';
+    c.style.left = (38 + Math.random()*24) + '%';
+    c.style.top = (62 + Math.random()*8) + '%';
+    c.style.setProperty('--dx', ((Math.random()-0.5)*60)+'px');
+    c.style.animationDelay = (i*0.05) + 's';
+    layer.appendChild(c);
+    setTimeout(() => c.remove(), 1200);
+  }
+}
+
+setInterval(() => {
+  if(!STATE.sleeping){
+    STATE.hunger = clamp(STATE.hunger - 0.3);
+    let energyDecay = 0.15;
+    if (INVENTORY.glasses) energyDecay *= 0.7;
+    STATE.energy = clamp(STATE.energy - energyDecay);
+    if(STATE.hunger < 3 || STATE.happy < 3) {
+      let decay = 0.2;
+      if (INVENTORY.headphones) decay *= 0.8;
+      if (INVENTORY.recordplayer) decay *= 0.7;
+      STATE.happy = clamp(STATE.happy - decay);
+    }
+    if(STATE.hunger <= 0 && Math.random() < 0.1) STATE.sick = true;
+  } else {
+    STATE.energy = clamp(STATE.energy + 0.4);
+    STATE.hunger = clamp(STATE.hunger - 0.1);
+  }
+  setStateClass();
+  renderMeters();
+}, 4000);
+
+setInterval(() => {
+  if(STATE.sleeping) return;
+  if(Math.random() < 0.18) {
+    const phrases = ["¡hu hu!","¡pío!","♪","..."];
+    say(phrases[Math.floor(Math.random()*phrases.length)], 1000);
+  }
+}, 5500);
+
+setInterval(() => {
+  if(STATE.sleeping) return;
+  const longPhrases = [
+    "Tengo hambre",
+    "Tengo Sueño",
+    "Estoy Sucio",
+    "Quiero Jugar",
+    "Eres aburrido",
+    "Eres muy divertido",
+    "Me agradas",
+    "Mi GPS es la luna llena.",
+    "El búho nunca llega tarde, siempre aparece de noche.",
+    "Soy búho: trabajo en el turno más silencioso.",
+    "El búho en el cine: solo compra entradas para funciones de medianoche.",
+    "Un búho influencer: transmite en vivo a las 3 AM.",
+    "El búho gamer: nunca apaga la consola, solo la pone en modo nocturno."
+  ];
+  say(longPhrases[Math.floor(Math.random() * longPhrases.length)], 4000);
+}, 50000);
+
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const a = btn.dataset.action;
+    if(a==='feed') feed();
+    else if(a==='play') play();
+    else if(a==='sleep') sleep();
+    else if(a==='clean') clean();
+    else if(a==='shop') document.getElementById('shopModal').classList.add('open');
+    renderMeters();
+  });
+});
+
+document.getElementById('closeShop').addEventListener('click', () => {
+  document.getElementById('shopModal').classList.remove('open');
+});
+
+const exitBtn = document.getElementById('exitBtn');
+if (exitBtn) {
+  exitBtn.addEventListener('click', () => {
+    window.close();
+  });
+}
+
+function applyTweaks(){
+  document.getElementById('petName').textContent = TWEAKS.petName || 'PIO';
+  document.body.classList.toggle('night', !!TWEAKS.night);
+  const sp = TWEAKS.speed || 1;
+  const overrides = [
+    ['.owl', TWEAKS.autoHop ? (2.6/sp)+'s' : '0s'],
+    ['.eyelid', (5/sp)+'s'],
+    ['.beak-bottom-grp', (3.4/sp)+'s'],
+    ['.wing-left', (2.2/sp)+'s'],
+    ['.wing-right', (2.2/sp)+'s'],
+    ['.breathe', (3/sp)+'s']
+  ];
+  overrides.forEach(([sel, dur]) => {
+    document.querySelectorAll(sel).forEach(el => {
+      if(dur === '0s') el.style.animation = 'none';
+      else { el.style.animation = ''; el.style.animationDuration = dur; }
+    });
+  });
+}
+applyTweaks(); renderMeters(); setStateClass();
+
+/* =================== EVOLUTION =================== */
+const EVO_KEY = 'poketgochi_evolved';
+function isEvolved(){ return localStorage.getItem(EVO_KEY) === '1'; }
+function setEvolved(v){
+  if(v){ localStorage.setItem(EVO_KEY, '1'); document.body.classList.add('is-evolved'); }
+  else { localStorage.removeItem(EVO_KEY); document.body.classList.remove('is-evolved'); }
+}
+let evoLock = false;
+function runEvolution(){
+  if(evoLock) return;
+  if(isEvolved()){ say("¡ya evolucionó!", 1500); return; }
+  evoLock = true;
+  const btn = document.getElementById('evolveBtn');
+  if(btn) btn.disabled = true;
+
+  // dismiss any active speech / sleep state for the show
+  document.getElementById('bubble').classList.remove('show');
+  STATE.sleeping = false; setStateClass();
+
+  document.body.classList.add('evo-running');
+  say("...!", 600);
+
+  // halfway through the flash, reveal the evolved owl (the CSS keyframes already coordinate visibility,
+  // but we toggle the body class so the post-evolution idle anims kick in cleanly)
+  setTimeout(() => {
+    document.body.classList.add('is-evolved');
+    localStorage.setItem(EVO_KEY, '1');
+  }, 2100);
+
+  // end of evolution
+  setTimeout(() => {
+    document.body.classList.remove('evo-running');
+    evoLock = false;
+    if(btn) btn.disabled = false;
+    say("¡EVOLUCIÓN!", 2000);
+    spawnHearts(8);
+    pulseExcited(1600);
+  }, 3300);
+}
+function resetEvolution(){
+  if(evoLock) return;
+  setEvolved(false);
+  document.body.classList.remove('evo-running');
+  const btn = document.getElementById('evolveBtn');
+  if(btn) btn.disabled = false;
+  say("rebobinando...", 1200);
+}
+// restore on load
+if(isEvolved()) document.body.classList.add('is-evolved');
+
+document.getElementById('evolveBtn').addEventListener('click', runEvolution);
+document.getElementById('resetEvolveBtn').addEventListener('click', resetEvolution);
+
+/* tweaks panel */
+let panelEl = null;
+function buildPanel(){
+  if(panelEl) return panelEl;
+  panelEl = document.createElement('div');
+  panelEl.style.cssText = `
+    position: fixed; bottom: 16px; left: 16px; z-index: 9999;
+    width: 240px; padding: 14px; border-radius: 14px;
+    background: rgba(28, 18, 10, 0.92); color: #fff8e9;
+    font-family: 'Fredoka', sans-serif; font-size: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+  `;
+  panelEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <strong style="letter-spacing:0.1em;">Tweaks</strong>
+      <button id="tw-close" style="background:transparent;border:0;color:#fff8e9;font-size:18px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <label style="display:block;margin-bottom:8px;">
+      Nombre
+      <input id="tw-name" value="${TWEAKS.petName}" style="width:100%;margin-top:4px;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:#fff;font-family:inherit;text-transform:uppercase;letter-spacing:0.1em;">
+    </label>
+    <label style="display:block;margin-bottom:8px;">
+      Velocidad: <span id="tw-speed-v">${TWEAKS.speed.toFixed(1)}x</span>
+      <input id="tw-speed" type="range" min="0.3" max="3" step="0.1" value="${TWEAKS.speed}" style="width:100%;">
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
+      <input id="tw-night" type="checkbox" ${TWEAKS.night?'checked':''}> Modo noche
+    </label>
+    <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer;">
+      <input id="tw-hop" type="checkbox" ${TWEAKS.autoHop?'checked':''}> Saltos automáticos
+    </label>
+  `;
+  document.body.appendChild(panelEl);
+  const persist = (edits) => {
+    Object.assign(TWEAKS, edits);
+    try { window.parent.postMessage({type:'__edit_mode_set_keys', edits}, '*'); } catch(e){}
+    applyTweaks();
+  };
+  panelEl.querySelector('#tw-name').addEventListener('input', e => persist({petName: e.target.value.toUpperCase()}));
+  panelEl.querySelector('#tw-speed').addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    panelEl.querySelector('#tw-speed-v').textContent = v.toFixed(1)+'x';
+    persist({speed: v});
+  });
+  panelEl.querySelector('#tw-night').addEventListener('change', e => persist({night: e.target.checked}));
+  panelEl.querySelector('#tw-hop').addEventListener('change', e => persist({autoHop: e.target.checked}));
+  panelEl.querySelector('#tw-close').addEventListener('click', () => {
+    panelEl.style.display = 'none';
+    try { window.parent.postMessage({type:'__edit_mode_dismissed'}, '*'); } catch(e){}
+  });
+  return panelEl;
+}
+window.addEventListener('message', (e) => {
+  const t = e.data && e.data.type;
+  if(t === '__activate_edit_mode'){ buildPanel().style.display = 'block'; }
+  else if(t === '__deactivate_edit_mode'){ if(panelEl) panelEl.style.display = 'none'; }
+});
+try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
+</script>
+</body>
+</html>
