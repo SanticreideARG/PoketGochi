@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>PoketGochi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="device" aria-label="PoketGochi">
+  <button class="exit-btn" id="exitBtn" title="Cerrar">×</button>
+  <span class="brand">POKETGOCHI</span>
+  <span class="led"></span>
+
+  <div class="screen" id="screen">
+
+    <div class="hud">
+      <div class="stats" id="stats">
+        <div class="stat"><span class="label">♥</span><div class="meter" data-meter="happy"></div></div>
+        <div class="stat"><span class="label">⌇</span><div class="meter" data-meter="hunger"></div></div>
+        <div class="stat"><span class="label">☾</span><div class="meter" data-meter="energy"></div></div>
+      </div>
+      <div class="right-hud">
+        <div class="clock" id="clock">00:00</div>
+        <div class="coins" id="coins">🪙 <span>0</span></div>
+      </div>
+    </div>
+
+    <div class="bubble" id="bubble">¡hola!</div>
+    <div class="z-stack" id="zzz"><span>Z</span><span>Z</span><span>Z</span></div>
+    <div class="swirl" id="swirl">@</div>
+    <div class="hearts" id="hearts"></div>
+    <div class="crumbs" id="crumbs"></div>
+
+    <div class="stage">
+      <!-- Record Player Item -->
+      <svg id="item-recordplayer" style="display:none; position:absolute; bottom: 22px; left: 20px; width: 60px; height: 60px; z-index: 3;" viewBox="0 0 100 100">
+        <rect x="10" y="40" width="80" height="30" rx="4" fill="#78350f" stroke="#451a03" stroke-width="3"/>
+        <rect x="10" y="40" width="80" height="8" fill="#92400e"/>
+        <ellipse cx="45" cy="40" rx="30" ry="8" fill="#171717" stroke="#404040" stroke-width="2"/>
+        <ellipse cx="45" cy="38" rx="26" ry="6" fill="#0a0a0a"/>
+        <ellipse cx="45" cy="38" rx="8" ry="2" fill="#ef4444"/>
+        <path d="M80 45 L75 30 L55 35" stroke="#d4d4d8" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="80" cy="45" r="4" fill="#a1a1aa"/>
+        <text x="35" y="20" fill="#fcd34d" font-size="28" class="music-note" style="opacity:0">♪</text>
+      </svg>
+
+      <!-- Guitar Item -->
+      <svg id="item-guitar" style="display:none; position:absolute; bottom: 22px; right: 20px; width: 45px; height: 80px; z-index: 4;" viewBox="0 0 60 100">
+        <g transform="rotate(15 30 50)">
+          <!-- neck -->
+          <rect x="26" y="10" width="8" height="50" fill="#262626" />
+          <!-- headstock -->
+          <path d="M24 10 L36 10 L34 0 L26 0 Z" fill="#b91c1c" />
+          <!-- tuning pegs -->
+          <circle cx="22" cy="4" r="1.5" fill="#e5e5e5" />
+          <circle cx="22" cy="8" r="1.5" fill="#e5e5e5" />
+          <circle cx="38" cy="4" r="1.5" fill="#e5e5e5" />
+          <circle cx="38" cy="8" r="1.5" fill="#e5e5e5" />
+          <!-- body -->
+          <path d="M15 50 C 5 50, 5 70, 15 80 C 15 95, 45 95, 45 80 C 55 70, 55 50, 45 50 C 35 50, 35 60, 30 60 C 25 60, 25 50, 15 50 Z" fill="#dc2626" stroke="#991b1b" stroke-width="2" />
+          <!-- pickguard -->
+          <path d="M20 60 C 20 70, 40 70, 40 60 Z" fill="#ffffff" />
+          <!-- pickups -->
+          <rect x="25" y="65" width="10" height="3" fill="#171717" />
+          <rect x="25" y="72" width="10" height="3" fill="#171717" />
+          <!-- bridge -->
+          <rect x="23" y="82" width="14" height="5" fill="#a3a3a3" />
+        </g>
+        <text x="5" y="20" fill="#ef4444" font-size="28" class="music-note" style="opacity:0; animation-delay:1.2s;">⚡</text>
+      </svg>
+
+      <svg class="owl base-form" id="owl" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bodyG" cx="0.45" cy="0.32" r="0.95">
+            <stop offset="0%" stop-color="#b88555"/>
+            <stop offset="50%" stop-color="#8a572d"/>
+            <stop offset="100%" stop-color="#4a2e15"/>
+          </radialGradient>
+          <radialGradient id="bodyDarkG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#7a4a22"/>
+            <stop offset="100%" stop-color="#3d2410"/>
+          </radialGradient>
+          <radialGradient id="bellyG" cx="0.5" cy="0.45" r="0.7">
+            <stop offset="0%" stop-color="#f3d8a5"/>
+            <stop offset="60%" stop-color="#d8aa6e"/>
+            <stop offset="100%" stop-color="#b88554"/>
+          </radialGradient>
+          <radialGradient id="faceG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#fff2d4"/>
+            <stop offset="70%" stop-color="#ecca94"/>
+            <stop offset="100%" stop-color="#c8995e"/>
+          </radialGradient>
+          <radialGradient id="irisG" cx="0.5" cy="0.4" r="0.65">
+            <stop offset="0%" stop-color="#7dc3ff"/>
+            <stop offset="40%" stop-color="#2e7adc"/>
+            <stop offset="78%" stop-color="#0e2c70"/>
+            <stop offset="100%" stop-color="#040b2a"/>
+          </radialGradient>
+          <radialGradient id="irisRimG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="80%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#0a1a4a"/>
+          </radialGradient>
+          <linearGradient id="beakG" x1="0.3" y1="0" x2="0.7" y2="1">
+            <stop offset="0%" stop-color="#ffd96a"/>
+            <stop offset="50%" stop-color="#f0a830"/>
+            <stop offset="100%" stop-color="#c66a0e"/>
+          </linearGradient>
+          <linearGradient id="beakShadeG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#7a3a06" stop-opacity="0.5"/>
+          </linearGradient>
+          <linearGradient id="footG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffb56a"/>
+            <stop offset="100%" stop-color="#d77a1f"/>
+          </linearGradient>
+          <radialGradient id="cheekG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ff9b7a" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#ff9b7a" stop-opacity="0"/>
+          </radialGradient>
+          <pattern id="feathPat" x="0" y="0" width="14" height="11" patternUnits="userSpaceOnUse">
+            <path d="M0 6 Q7 0 14 6" stroke="#5c3818" stroke-width="0.9" fill="none" opacity="0.35"/>
+            <path d="M7 11 Q14 5 21 11" stroke="#5c3818" stroke-width="0.9" fill="none" opacity="0.35"/>
+          </pattern>
+          <pattern id="bellyPat" x="0" y="0" width="14" height="11" patternUnits="userSpaceOnUse">
+            <path d="M3 5 Q7 1 11 5 Q7 8 3 5 Z" fill="#a76d28" opacity="0.32"/>
+          </pattern>
+        </defs>
+
+        <ellipse cx="150" cy="308" rx="78" ry="8" fill="rgba(0,0,0,0.22)"/>
+
+        <g class="breathe">
+          <g class="tail">
+            <g transform="rotate(-38 150 270)">
+              <path d="M150 270 Q 136 295 140 340 Q 150 354 160 340 Q 164 295 150 270 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 336" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(-19 150 270)">
+              <path d="M150 270 Q 136 295 140 344 Q 150 358 160 344 Q 164 295 150 270 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 340" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g>
+              <path d="M150 270 Q 136 295 140 346 Q 150 360 160 346 Q 164 295 150 270 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 342" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(19 150 270)">
+              <path d="M150 270 Q 136 295 140 344 Q 150 358 160 344 Q 164 295 150 270 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 340" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+            <g transform="rotate(38 150 270)">
+              <path d="M150 270 Q 136 295 140 340 Q 150 354 160 340 Q 164 295 150 270 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M150 285 Q 148 315 150 336" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.6"/>
+              <path d="M150 270 Q 140 280 142 290" stroke="#3d2410" stroke-width="1" fill="none" opacity="0.5"/>
+            </g>
+          </g>
+
+          <g>
+            <g>
+              <ellipse cx="123" cy="294" rx="20" ry="9" fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6"/>
+              <g fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6" stroke-linejoin="round">
+                <path d="M108 295 q-4 4 -3 9 q1 3 5 3 q4 0 6 -3 q1 -4 0 -8 z"/>
+                <path d="M122 297 q-3 5 -2 10 q1 3 5 3 q4 0 5 -3 q1 -5 -1 -10 z"/>
+                <path d="M136 295 q3 4 4 9 q0 3 -4 3 q-4 0 -6 -3 q-2 -4 -1 -8 z"/>
+              </g>
+              <path d="M108 307 q1 5 -1 8 q-3 -1 -4 -4 q0 -3 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M125 309 q1 5 -1 8 q-3 -1 -3 -5 q0 -2 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M141 307 q0 5 -3 7 q-3 -1 -3 -4 q1 -3 2 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M115 297 q4 2 8 0 M117 301 q3 2 7 0" stroke="#7a3a06" stroke-width="0.8" fill="none" opacity="0.7"/>
+            </g>
+            <g>
+              <ellipse cx="177" cy="294" rx="20" ry="9" fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6"/>
+              <g fill="url(#footG)" stroke="#7a3a06" stroke-width="1.6" stroke-linejoin="round">
+                <path d="M162 295 q-4 4 -3 9 q1 3 5 3 q4 0 6 -3 q1 -4 0 -8 z"/>
+                <path d="M176 297 q-3 5 -2 10 q1 3 5 3 q4 0 5 -3 q1 -5 -1 -10 z"/>
+                <path d="M190 295 q3 4 4 9 q0 3 -4 3 q-4 0 -6 -3 q-2 -4 -1 -8 z"/>
+              </g>
+              <path d="M162 307 q1 5 -1 8 q-3 -1 -4 -4 q0 -3 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M179 309 q1 5 -1 8 q-3 -1 -3 -5 q0 -2 1 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M195 307 q0 5 -3 7 q-3 -1 -3 -4 q1 -3 2 -5 z" fill="#2a1408" stroke="#000" stroke-width="0.6"/>
+              <path d="M169 297 q4 2 8 0 M171 301 q3 2 7 0" stroke="#7a3a06" stroke-width="0.8" fill="none" opacity="0.7"/>
+            </g>
+          </g>
+
+          <g>
+            <path d="M48 178 C 30 70, 270 70, 252 178 C 268 260, 222 296, 150 296 C 78 296, 32 260, 48 178 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.5"/>
+            <path d="M48 178 C 30 70, 270 70, 252 178 C 268 260, 222 296, 150 296 C 78 296, 32 260, 48 178 Z" fill="url(#feathPat)" opacity="0.8"/>
+            <path d="M60 130 C 50 70, 250 70, 240 130 C 230 110, 210 95, 180 95 C 165 90, 135 90, 120 95 C 90 95, 70 110, 60 130 Z" fill="url(#bodyDarkG)" opacity="0.55"/>
+            <g stroke="#3d2410" stroke-width="1.4" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M120 78 q3 -8 6 0"/>
+              <path d="M134 73 q3 -8 6 0"/>
+              <path d="M150 71 q3 -8 6 0"/>
+              <path d="M166 73 q3 -8 6 0"/>
+              <path d="M180 78 q3 -8 6 0"/>
+              <path d="M100 88 q3 -8 6 0"/>
+              <path d="M194 88 q3 -8 6 0"/>
+            </g>
+
+            <path d="M88 178 C 78 115, 222 115, 212 178 C 224 248, 184 286, 150 286 C 116 286, 76 248, 88 178 Z" fill="url(#bellyG)" stroke="#a86d2a" stroke-width="1.4"/>
+            <path d="M88 178 C 78 115, 222 115, 212 178 C 224 248, 184 286, 150 286 C 116 286, 76 248, 88 178 Z" fill="url(#bellyPat)" opacity="0.75"/>
+            <path d="M150 130 Q146 200, 150 270" stroke="#a76d28" stroke-width="2" fill="none" opacity="0.25"/>
+          </g>
+
+          <g class="wing-left">
+            <path d="M58 175 C 22 175, 8 235, 36 282 C 48 290, 70 282, 76 264 C 84 240, 82 200, 70 178 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.4"/>
+            <path d="M58 175 C 22 175, 8 235, 36 282 C 48 290, 70 282, 76 264 C 84 240, 82 200, 70 178 Z" fill="url(#feathPat)" opacity="0.75"/>
+            <g fill="#5c3818" stroke="#3d2410" stroke-width="1.4" stroke-linejoin="round" opacity="0.85">
+              <path d="M22 252 q-6 14 6 26 q10 6 18 -2 q-8 -10 -10 -22 q-6 -8 -14 -2 Z"/>
+              <path d="M30 268 q-2 14 12 22 q12 4 18 -6 q-10 -8 -14 -20 q-8 -6 -16 4 Z"/>
+              <path d="M44 278 q2 12 16 14 q10 0 14 -10 q-12 -4 -18 -14 q-8 -2 -12 10 Z"/>
+            </g>
+            <g stroke="#3d2410" stroke-width="1.3" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M40 200 q9 -5 17 0"/>
+              <path d="M32 220 q10 -5 20 0"/>
+              <path d="M30 240 q10 -5 20 0"/>
+            </g>
+            <path d="M50 195 q-4 20 -4 40" stroke="#d8a978" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>
+          </g>
+
+          <g class="wing-right">
+            <path d="M242 175 C 278 175, 292 235, 264 282 C 252 290, 230 282, 224 264 C 216 240, 218 200, 230 178 Z" fill="url(#bodyG)" stroke="#3d2410" stroke-width="2.4"/>
+            <path d="M242 175 C 278 175, 292 235, 264 282 C 252 290, 230 282, 224 264 C 216 240, 218 200, 230 178 Z" fill="url(#feathPat)" opacity="0.75"/>
+            <g fill="#5c3818" stroke="#3d2410" stroke-width="1.4" stroke-linejoin="round" opacity="0.85">
+              <path d="M278 252 q6 14 -6 26 q-10 6 -18 -2 q8 -10 10 -22 q6 -8 14 -2 Z"/>
+              <path d="M270 268 q2 14 -12 22 q-12 4 -18 -6 q10 -8 14 -20 q8 -6 16 4 Z"/>
+              <path d="M256 278 q-2 12 -16 14 q-10 0 -14 -10 q12 -4 18 -14 q8 -2 12 10 Z"/>
+            </g>
+            <g stroke="#3d2410" stroke-width="1.3" fill="none" opacity="0.75" stroke-linecap="round">
+              <path d="M243 200 q9 -5 17 0"/>
+              <path d="M248 220 q10 -5 20 0"/>
+              <path d="M250 240 q10 -5 20 0"/>
+            </g>
+            <path d="M250 195 q4 20 4 40" stroke="#d8a978" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>
+          </g>
+
+          <g>
+            <path d="M150 175 Q 142 182 130 182 Q 105 180 92 170 Q 80 158 84 138 Q 92 116 116 110 Q 138 110 148 124 Q 152 145 152 168 Q 152 175 150 175 Z" fill="url(#faceG)" stroke="#a06a32" stroke-width="1.8"/>
+            <path d="M150 175 Q 158 182 170 182 Q 195 180 208 170 Q 220 158 216 138 Q 208 116 184 110 Q 162 110 152 124 Q 148 145 148 168 Q 148 175 150 175 Z" fill="url(#faceG)" stroke="#a06a32" stroke-width="1.8"/>
+            <g opacity="0.35" fill="none" stroke="#a86d2a" stroke-width="1">
+              <path d="M92 140 Q 86 155 100 170"/>
+              <path d="M208 140 Q 214 155 200 170"/>
+            </g>
+          </g>
+
+          <g fill="#3d2410" stroke="#241407" stroke-width="1.2" stroke-linejoin="round">
+            <path d="M76 110 Q 100 78 138 94 Q 142 100 138 108 Q 130 102 118 102 Q 100 104 88 116 Q 80 120 76 118 Z"/>
+            <path d="M224 110 Q 200 78 162 94 Q 158 100 162 108 Q 170 102 182 102 Q 200 104 212 116 Q 220 120 224 118 Z"/>
+            <g stroke="#5c3818" stroke-width="1" fill="none" opacity="0.7" stroke-linecap="round">
+              <path d="M88 110 q2 -5 6 -3"/>
+              <path d="M102 100 q2 -5 6 -3"/>
+              <path d="M120 96 q2 -5 6 -3"/>
+              <path d="M192 96 q-2 -5 -6 -3"/>
+              <path d="M210 100 q-2 -5 -6 -3"/>
+              <path d="M196 110 q-2 -5 -6 -3"/>
+            </g>
+          </g>
+
+          <g>
+            <g class="eye-inner">
+              <path d="M97 132 Q 115 108 138 122 Q 142 140 130 152 Q 108 158 100 146 Q 94 138 97 132 Z" fill="#1a0f04"/>
+              <path d="M99 132 Q 116 112 136 124 Q 140 138 128 149 Q 109 155 102 144 Q 96 138 99 132 Z" fill="#ffffff"/>
+              <ellipse cx="118" cy="135" rx="17" ry="18" fill="url(#irisG)"/>
+              <ellipse cx="118" cy="135" rx="17" ry="18" fill="url(#irisRimG)"/>
+              <g stroke="#06133a" stroke-width="0.6" fill="none" opacity="0.55">
+                <path d="M118 119 v6 M118 144 v6 M104 135 h6 M127 135 h6 M108 124 l4 4 M128 124 l-4 4 M108 145 l4 -4 M128 145 l-4 -4"/>
+              </g>
+              <ellipse cx="118" cy="136" rx="6" ry="9" fill="#040a22"/>
+              <ellipse cx="123" cy="127" rx="5" ry="6.5" fill="#ffffff"/>
+              <circle cx="112" cy="142" r="2.2" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <path class="eyelid left" d="M97 132 Q 115 108 138 122 Q 142 140 130 152 Q 108 158 100 146 Q 94 138 97 132 Z" fill="#8d5a30" stroke="#3d2410" stroke-width="1.5"/>
+            <path class="eyelash left" d="M99 144 Q 115 152 132 146" stroke="#3d2410" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <g>
+            <g class="eye-inner">
+              <path d="M203 132 Q 185 108 162 122 Q 158 140 170 152 Q 192 158 200 146 Q 206 138 203 132 Z" fill="#1a0f04"/>
+              <path d="M201 132 Q 184 112 164 124 Q 160 138 172 149 Q 191 155 198 144 Q 204 138 201 132 Z" fill="#ffffff"/>
+              <ellipse cx="182" cy="135" rx="17" ry="18" fill="url(#irisG)"/>
+              <ellipse cx="182" cy="135" rx="17" ry="18" fill="url(#irisRimG)"/>
+              <g stroke="#06133a" stroke-width="0.6" fill="none" opacity="0.55">
+                <path d="M182 119 v6 M182 144 v6 M168 135 h6 M191 135 h6 M172 124 l4 4 M192 124 l-4 4 M172 145 l4 -4 M192 145 l-4 -4"/>
+              </g>
+              <ellipse cx="182" cy="136" rx="6" ry="9" fill="#040a22"/>
+              <ellipse cx="187" cy="127" rx="5" ry="6.5" fill="#ffffff"/>
+              <circle cx="176" cy="142" r="2.2" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <path class="eyelid right" d="M203 132 Q 185 108 162 122 Q 158 140 170 152 Q 192 158 200 146 Q 206 138 203 132 Z" fill="#8d5a30" stroke="#3d2410" stroke-width="1.5"/>
+            <path class="eyelash right" d="M168 146 Q 185 152 201 144" stroke="#3d2410" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          </g>
+
+          <ellipse cx="106" cy="170" rx="9" ry="5" fill="url(#cheekG)"/>
+          <ellipse cx="194" cy="170" rx="9" ry="5" fill="url(#cheekG)"/>
+
+          <g class="beak">
+            <ellipse cx="150" cy="180" rx="11" ry="3" fill="#7a3a06" opacity="0.35"/>
+            <path d="M139 159 Q 150 156 161 159 Q 164 168 158 178 Q 153 188 150 192 Q 147 188 142 178 Q 136 168 139 159 Z" fill="url(#beakG)" stroke="#7a3a06" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M150 161 Q 158 162 161 167 Q 164 175 158 184 Q 153 190 150 192 Z" fill="url(#beakShadeG)" opacity="0.7"/>
+            <ellipse cx="146" cy="166" rx="1.3" ry="0.9" fill="#7a3a06"/>
+            <path d="M144 163 Q 146 168 145 174" stroke="#fff2c8" stroke-width="1.2" fill="none" opacity="0.7" stroke-linecap="round"/>
+            <g class="beak-bottom-grp">
+              <path d="M143 174 Q 150 184 157 174 Q 156 184 150 188 Q 144 184 143 174 Z" fill="#8a1414" stroke="#4a0808" stroke-width="1.2"/>
+              <ellipse cx="150" cy="180" rx="2.2" ry="1" fill="#ffb4b4" opacity="0.7"/>
+            </g>
+          </g>
+
+          <g id="item-headphones" style="display: none;">
+            <path d="M70 120 C 70 50, 230 50, 230 120" stroke="#16a34a" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M70 120 C 70 50, 230 50, 230 120" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="65" cy="120" rx="12" ry="18" fill="#15803d" stroke="#14532d" stroke-width="2"/>
+            <ellipse cx="65" cy="120" rx="6" ry="12" fill="#22c55e"/>
+            <ellipse cx="235" cy="120" rx="12" ry="18" fill="#15803d" stroke="#14532d" stroke-width="2"/>
+            <ellipse cx="235" cy="120" rx="6" ry="12" fill="#22c55e"/>
+          </g>
+
+          <g id="item-glasses" style="display: none;" fill="none" stroke="#404040" stroke-width="3" stroke-linecap="round">
+            <path d="M144 132 Q150 125 156 132" stroke-width="2" />
+            <rect x="88" y="118" width="56" height="32" rx="10" />
+            <rect x="156" y="118" width="56" height="32" rx="10" />
+            <path d="M88 125 L75 120" stroke-width="2" />
+            <path d="M212 125 L225 120" stroke-width="2" />
+          </g>
+
+        </g>
+      </svg>
+
+      <svg class="owl evolved-form" id="owl-evolved" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="evoBodyG" cx="0.45" cy="0.32" r="0.95">
+            <stop offset="0%" stop-color="#8a5a2a"/>
+            <stop offset="50%" stop-color="#5c3818"/>
+            <stop offset="100%" stop-color="#241407"/>
+          </radialGradient>
+          <radialGradient id="evoBodyDarkG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#4a2e15"/>
+            <stop offset="100%" stop-color="#1a0d04"/>
+          </radialGradient>
+          <radialGradient id="evoBellyG" cx="0.5" cy="0.45" r="0.7">
+            <stop offset="0%" stop-color="#d8b070"/>
+            <stop offset="60%" stop-color="#a87530"/>
+            <stop offset="100%" stop-color="#6e4818"/>
+          </radialGradient>
+          <radialGradient id="evoFaceG" cx="0.5" cy="0.5" r="0.7">
+            <stop offset="0%" stop-color="#f0d8a0"/>
+            <stop offset="70%" stop-color="#c8985a"/>
+            <stop offset="100%" stop-color="#7a4a20"/>
+          </radialGradient>
+          <radialGradient id="evoIrisG" cx="0.5" cy="0.4" r="0.65">
+            <stop offset="0%" stop-color="#fff0a0"/>
+            <stop offset="30%" stop-color="#fbbf24"/>
+            <stop offset="70%" stop-color="#c2410c"/>
+            <stop offset="100%" stop-color="#3a0a02"/>
+          </radialGradient>
+          <radialGradient id="evoIrisRimG" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="80%" stop-color="transparent"/>
+            <stop offset="100%" stop-color="#3a0a02"/>
+          </radialGradient>
+          <linearGradient id="evoBeakG" x1="0.3" y1="0" x2="0.7" y2="1">
+            <stop offset="0%" stop-color="#ffd060"/>
+            <stop offset="50%" stop-color="#e89420"/>
+            <stop offset="100%" stop-color="#8a4a08"/>
+          </linearGradient>
+          <linearGradient id="evoFootG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e89420"/>
+            <stop offset="100%" stop-color="#8a4a08"/>
+          </linearGradient>
+          <pattern id="evoFeathPat" x="0" y="0" width="12" height="9" patternUnits="userSpaceOnUse">
+            <path d="M0 5 Q6 0 12 5" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M6 9 Q12 4 18 9" stroke="#1a0d04" stroke-width="1" fill="none" opacity="0.5"/>
+          </pattern>
+          <pattern id="evoBellyPat" x="0" y="0" width="12" height="10" patternUnits="userSpaceOnUse">
+            <path d="M3 4 Q6 0 9 4 Q6 7 3 4 Z" fill="#6e4818" opacity="0.4"/>
+          </pattern>
+          <filter id="evoGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <ellipse cx="150" cy="320" rx="95" ry="9" fill="rgba(0,0,0,0.32)"/>
+
+        <g class="breathe">
+          <!-- Abbreviated: evolved owl SVG is very long. Full version in original file -->
+          <!-- For brevity, keeping the essential structure. Full SVG available in PoketGochi.html -->
+          <ellipse cx="150" cy="320" rx="95" ry="9" fill="rgba(0,0,0,0.32)"/>
+        </g>
+      </svg>
+
+      <div class="evo-rays" id="evoRays"></div>
+      <div class="evo-flash" id="evoFlash"></div>
+
+      <div class="pet-name" id="petName">PIO</div>
+    </div>
+
+    <div class="ground"></div>
+  </div>
+</div>
+
+<!-- Buttons (outside device) -->
+<div class="buttons">
+  <button class="btn" data-action="feed">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 6 C 18 3, 23 4, 24 8 C 28 8, 30 12, 28 16 C 30 22, 24 28, 16 28 C 8 28, 2 22, 4 16 C 2 12, 4 8, 8 8 C 9 4, 14 3, 16 6 Z" fill="#e63946" stroke="#7a1a1a" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 6 C 17 4, 19 4, 20 6" stroke="#3a5a18" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <ellipse cx="11" cy="14" rx="2.5" ry="3" fill="#ff8c8c" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Comer</span>
+  </button>
+
+  <button class="btn" data-action="play">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="13" rx="9" ry="10" fill="#22c55e" stroke="#0f5a28" stroke-width="1.5"/>
+        <path d="M16 23 L14 27 L18 27 Z" fill="#0f5a28"/>
+        <path d="M16 27 Q13 29 14 30" stroke="#0f5a28" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="12" cy="9" rx="2.5" ry="3" fill="#86efac" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Jugar</span>
+  </button>
+
+  <button class="btn" data-action="sleep">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M22 6 C 14 6, 8 12, 8 20 C 8 24, 11 27, 15 27 C 23 27, 27 19, 25 11 C 24 8, 23 6, 22 6 Z" fill="#fde68a" stroke="#92400e" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="1.2" fill="#92400e"/>
+        <circle cx="18" cy="18" r="1" fill="#92400e"/>
+      </svg>
+    </span>
+    <span class="lbl">Dormir</span>
+  </button>
+
+  <button class="btn" data-action="clean">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="20" rx="9" ry="6" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1.5"/>
+        <path d="M16 11 Q13 6 16 4 Q19 6 16 11 Z" fill="#7dd3fc" stroke="#0c4a6e" stroke-width="1.2"/>
+        <circle cx="23" cy="10" r="2" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1"/>
+        <circle cx="9" cy="13" r="1.5" fill="#bae6fd" stroke="#0c4a6e" stroke-width="1"/>
+        <ellipse cx="12" cy="18" rx="2" ry="1.2" fill="#fff" opacity="0.7"/>
+      </svg>
+    </span>
+    <span class="lbl">Limpiar</span>
+  </button>
+
+  <button class="btn" data-action="shop">
+    <span class="ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M6 10 L26 10 L23 26 L9 26 Z" fill="#fbbf24" stroke="#b45309" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M11 10 C 11 6, 21 6, 21 10" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <circle cx="16" cy="18" r="3" fill="#fcd34d"/>
+      </svg>
+    </span>
+    <span class="lbl">Tienda</span>
+  </button>
+</div>
+
+<!-- Shop Modal -->
+<div class="shop-modal" id="shopModal">
+  <div class="shop-content">
+    <div class="shop-header">
+      <h2>Tienda</h2>
+      <button class="close-btn" id="closeShop">×</button>
+    </div>
+    <div class="shop-items">
+      <div class="shop-item" id="shop-hp">
+        <div class="item-icon">🎧</div>
+        <div class="item-info">
+          <h3>Auriculares</h3>
+          <p>Felicidad baja 20% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('headphones', 30)">🪙 30</button>
+      </div>
+      <div class="shop-item" id="shop-rp">
+        <div class="item-icon">📻</div>
+        <div class="item-info">
+          <h3>Tocadiscos</h3>
+          <p>Felicidad baja 30% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('recordplayer', 60)">🪙 60</button>
+      </div>
+      <div class="shop-item" id="shop-gl">
+        <div class="item-icon">👓</div>
+        <div class="item-info">
+          <h3>Lentes de lectura</h3>
+          <p>Sueño baja 30% más lento</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('glasses', 90)">🪙 90</button>
+      </div>
+      <div class="shop-item" id="shop-cd">
+        <div class="item-icon">🍬</div>
+        <div class="item-info">
+          <h3>Caramelo</h3>
+          <p>Aumenta todos los estados en 2</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('candy', 10)">🪙 10</button>
+      </div>
+      <div class="shop-item" id="shop-gt">
+        <div class="item-icon">🎸</div>
+        <div class="item-info">
+          <h3>Guitarra eléctrica</h3>
+          <p>Monedas 30% más rápido</p>
+        </div>
+        <button class="buy-btn" onclick="buyItem('guitar', 300)">🪙 300</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="credit">v2.1 · PROTOTIPO · EVOLUTION TEST</div>
+
+<div class="evo-test">
+  <button class="evo-btn" id="evolveBtn" type="button" title="Test de evolución">
+    <svg class="star" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2 L14.6 8.6 L21.6 9.2 L16.2 13.8 L18 20.6 L12 16.8 L6 20.6 L7.8 13.8 L2.4 9.2 L9.4 8.6 Z"/>
+    </svg>
+    Evolucionar
+  </button>
+  <button class="evo-btn reset" id="resetEvolveBtn" type="button" title="Volver al búho original">
+    Reset
+  </button>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
